@@ -271,7 +271,7 @@
                 "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/backendAddressPools/', variables('bePoolName'))]"
               },
               "probe": {
-                "id":  "[concat(variables('lbID'), '/probes/healthCheck')]"
+                "id":  "[concat(variables('lbID'), '/probes/dbHealthCheck')]"
               }
             }
           },
@@ -293,7 +293,7 @@
                 "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/backendAddressPools/', variables('bePoolName'))]"
               },
               "probe": {
-                "id":  "[concat(variables('lbID'), '/probes/healthCheck')]"
+                "id":  "[concat(variables('lbID'), '/probes/dbHealthCheck')]"
               }
             }
           }
