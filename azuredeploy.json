@@ -393,7 +393,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-               "[concat('https://raw.githubusercontent.com/tamhinsf/CockroachDb4Azure/master', concat('/', variables('vmssScriptFileName')))]"              
+               "[concat('https://raw.githubusercontent.com/tamhinsf/CockroachDb4Azure/master', concat('/', variables('scriptFileName')))]"              
               ]
             },
             "protectedSettings": {
