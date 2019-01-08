@@ -176,6 +176,9 @@
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', variables('jumpBoxNicName'))]"
       ],
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "properties": {
         "hardwareProfile": {
           "vmSize": "[parameters('jumpBoxSku')]"
@@ -208,12 +211,32 @@
       },
         "resources" :[
           {
+            "name": "[concat(variables('jumpBoxName'),'/MSILinuxExtension')]",
+            "type": "extensions",
+            "apiVersion": "2017-12-01",
+            "location": "[variables('location')]",
+            "dependsOn": [
+              "[variables('jumpBoxName')]"
+            ],
+            "properties": {
+              "publisher": "Microsoft.ManagedIdentity",
+              "type": "ManagedIdentityExtensionForLinux",
+              "typeHandlerVersion": "1.0",
+              "autoUpgradeMinorVersion": true,
+              "settings": {
+                "port": 50342
+              },
+              "protectedSettings": {}
+            }
+          },
+          {
             "name": "jboxScript",
             "type": "extensions",
             "apiVersion": "2017-03-30",
             "location": "[variables('location')]",
             "dependsOn": [
-              "[variables('jumpBoxName')]"
+              "[variables('jumpBoxName')]",
+              "[concat(variables('jumpBoxName'),'/MSILinuxExtension')]"
             ],
             "properties": {
               "publisher": "Microsoft.Azure.Extensions",
