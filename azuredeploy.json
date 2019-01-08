@@ -23,6 +23,24 @@
       },
       "maxValue": 5
     },
+    "dataDiskNumber" : {
+      "type" : "int",
+      "defaultValue": 1,
+      "minValue": 1,
+      "maxValue": 4,
+      "metadata": {
+        "description": "Number of data disk(s)."
+      }
+    },
+    "dataDiskSize" : {
+      "type" : "int",
+      "defaultValue": 512,
+      "minValue": 32,
+      "maxValue": 4095,
+      "metadata": {
+        "description": "Size of each data disk(s)."
+      }
+    },
     "jumpBoxSku":  {
       "type": "string",
       "defaultValue": "Standard_D2s_v3",
@@ -323,6 +341,9 @@
         "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
         "[variables('jumpBoxName')]"
       ],
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "sku": {
         "name": "[parameters('vmSku')]",
         "tier": "Standard",
@@ -338,7 +359,34 @@
             "osDisk": {
               "createOption": "FromImage"
             },
-            "imageReference": "[variables('imageReference')]"
+            "imageReference": "[variables('imageReference')]",
+            "copy": [
+              {
+                "name": "dataDisks",
+                "count": "[parameters('dataDiskNumber')]",
+                "input": {
+                  "diskSizeGB": "[parameters('dataDiskSize')]",
+                  "lun": "[copyIndex('dataDisks')]",
+                  "createOption": "Empty"
+                }
+              }
+            ],
+            "extensionProfile": {
+              "extensions": [
+                  {
+                      "name": "ManagedIdentityExtensionForLinux",
+                      "properties": {
+                        "publisher": "Microsoft.ManagedIdentity",
+                        "type": "ManagedIdentityExtensionForLinux",
+                        "typeHandlerVersion": "1.0",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "port": 50342
+                        }
+                      }
+                  } 
+              ]
+          }
           },
           "osProfile": {
             "computerNamePrefix": "[variables('namingInfix')]",
@@ -391,7 +439,7 @@
                       ]
                     },
                     "protectedSettings": {
-                      "commandToExecute": "[concat('bash ', variables('vmssScriptFileName'))]"
+                      "commandToExecute": "[concat('bash ', variables('vmssScriptFileName'), ' ' , parameters('dataDiskNumber'))]"
                     }
                   }
                 }
