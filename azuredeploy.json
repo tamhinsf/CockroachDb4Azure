@@ -41,21 +41,7 @@
       "metadata": {
         "description": "Admin password on all VMs."
       }
-    },
-      "_artifactsLocation": {
-        "type": "string",
-        "metadata": {
-          "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
-        },
-        "defaultValue": "https://raw.githubusercontent.com/tamhinsf/CockroachDb4Azure/master/"
-      },
-      "_artifactsLocationSasToken": {
-        "type": "securestring",
-        "metadata": {
-          "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
-        },
-        "defaultValue": ""
-      }
+    }
   },
   "variables": {
     "location": "[resourceGroup().location]",
@@ -89,6 +75,7 @@
     },
     "imageReference": "[variables('osType')]",
     "scriptFileName" : "jbox-deploy.sh",
+    "vmssScriptFileName" : "vmss-deploy.sh",
     "scriptArgs" : ""
   },
   "resources": [
@@ -199,7 +186,8 @@
           "bootDiagnostics": {
             "enabled": false
           }
-        },
+        }
+      },
         "resources" :[
           {
             "name": "foo",
@@ -216,7 +204,7 @@
               "autoUpgradeMinorVersion": true,
               "settings": {
                 "fileUris": [
-                 "[concat(parameters('_artifactsLocation'), concat('/', variables('scriptFileName'), parameters('_artifactsLocationSasToken')))]"              
+                 "[concat('https://raw.githubusercontent.com/tamhinsf/CockroachDb4Azure/master', concat('/', variables('scriptFileName')))]"              
                 ]
               },
               "protectedSettings": {
@@ -225,9 +213,7 @@
             }
           }
         ]
-
-      }
-    },
+      },
     {
       "type": "Microsoft.Network/loadBalancers",
       "name": "[variables('loadBalancerName')]",
@@ -334,7 +320,8 @@
       "apiVersion": "2018-06-01",
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]"
+        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
+        "[variables('jumpBoxName')]"
       ],
       "sku": {
         "name": "[parameters('vmSku')]",
@@ -389,7 +376,32 @@
             ]
           }
         }
-      }
+      },
+      "resources": [
+        {
+          "name": "foo",
+          "type": "extensions",
+          "apiVersion": "2017-03-30",
+          "location": "[variables('location')]",
+          "dependsOn": [
+            "[variables('jumpBoxName')]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Azure.Extensions",
+            "type": "CustomScript",
+            "typeHandlerVersion": "2.0",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": [
+               "[concat('https://raw.githubusercontent.com/tamhinsf/CockroachDb4Azure/master', concat('/', variables('vmssScriptFileName')))]"              
+              ]
+            },
+            "protectedSettings": {
+              "commandToExecute": "[concat('bash ', variables('scriptFileName'), ' ', variables('scriptArgs'))]"
+            }
+          }
+        }
+      ]
     }
   ]
 }

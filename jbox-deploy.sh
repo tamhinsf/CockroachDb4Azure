@@ -8,8 +8,9 @@ echo $@ >> $LOG_PATH 2>&1
 date > $LOG_PATH 2>&1
 whoami >> $LOG_PATH 2>&1
 
-wget -qO- https://binaries.cockroachdb.com/cockroach-v2.1.3.linux-amd64.tgz | tar  xvz  2>&1
-cp -i cockroach-v2.1.3.linux-amd64/cockroach /usr/local/bin  2>&1
+wget -qO- https://binaries.cockroachdb.com/cockroach-v2.1.3.linux-amd64.tgz | tar  xvz  >> $LOG_PATH 2>&1
+cp -i cockroach-v2.1.3.linux-amd64/cockroach /usr/local/bin  >> $LOG_PATH 2>&1
 
+echo done  >> $LOG_PATH 2>&1
 # Exit script with 0 code to tell Azure that the deployment is done
 exit 0 >> $LOG_PATH 2>&1
