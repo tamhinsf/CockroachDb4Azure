@@ -211,7 +211,7 @@
       },
         "resources" :[
           {
-            "name": "[concat(variables('jumpBoxName'),'/MSILinuxExtension')]",
+            "name": "[concat(variables('jumpBoxName'),'MSILinuxExtension')]",
             "type": "extensions",
             "apiVersion": "2017-12-01",
             "location": "[variables('location')]",
@@ -236,7 +236,7 @@
             "location": "[variables('location')]",
             "dependsOn": [
               "[variables('jumpBoxName')]",
-              "[concat(variables('jumpBoxName'),'/MSILinuxExtension')]"
+              "[concat(variables('jumpBoxName'),'MSILinuxExtension')]"
             ],
             "properties": {
               "publisher": "Microsoft.Azure.Extensions",
@@ -433,7 +433,7 @@
           "extensionProfile":{
             "extensions":[
               {
-                "name": "ManagedIdentityExtensionForLinux",
+                "name": "[concat(variables('namingInfix'),'MSILinuxExtension')]",
                 "properties": {
                   "publisher": "Microsoft.ManagedIdentity",
                   "type": "ManagedIdentityExtensionForLinux",
