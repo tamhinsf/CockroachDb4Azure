@@ -30,6 +30,8 @@ else
   echo "UUID=`blkid -s UUID /dev/md0 | cut -d '"' -f2` $COCKROACHDB_PATH ext4  defaults,discard 0 0" | tee -a /etc/fstab >> $LOG_PATH 2>&1
 fi
 
+mount $COCKROACHDB_PATH
+
 wget -qO- https://binaries.cockroachdb.com/cockroach-v2.1.3.linux-amd64.tgz | tar  xvz >> $LOG_PATH 2>&1
 cp -i cockroach-v2.1.3.linux-amd64/cockroach /usr/local/bin  >> $LOG_PATH 2>&1
 mkdir /var/lib/cockroach >> $LOG_PATH 2>&1

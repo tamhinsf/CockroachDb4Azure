@@ -370,23 +370,7 @@
                   "createOption": "Empty"
                 }
               }
-            ],
-            "extensionProfile": {
-              "extensions": [
-                  {
-                      "name": "ManagedIdentityExtensionForLinux",
-                      "properties": {
-                        "publisher": "Microsoft.ManagedIdentity",
-                        "type": "ManagedIdentityExtensionForLinux",
-                        "typeHandlerVersion": "1.0",
-                        "autoUpgradeMinorVersion": true,
-                        "settings": {
-                            "port": 50342
-                        }
-                      }
-                  } 
-              ]
-          }
+            ]
           },
           "osProfile": {
             "computerNamePrefix": "[variables('namingInfix')]",
@@ -425,6 +409,18 @@
           },
           "extensionProfile":{
             "extensions":[
+              {
+                "name": "ManagedIdentityExtensionForLinux",
+                "properties": {
+                  "publisher": "Microsoft.ManagedIdentity",
+                  "type": "ManagedIdentityExtensionForLinux",
+                  "typeHandlerVersion": "1.0",
+                  "autoUpgradeMinorVersion": true,
+                  "settings": {
+                      "port": 50342
+                  }
+                }
+              },
               {
                   "name": "vmssScript",
                   "properties": {
