@@ -379,7 +379,7 @@
       },
       "resources": [
         {
-          "name": "foo",
+          "name": "fooVmss",
           "type": "extensions",
           "apiVersion": "2017-03-30",
           "location": "[variables('location')]",
