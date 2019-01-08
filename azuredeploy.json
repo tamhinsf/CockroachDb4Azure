@@ -23,8 +23,8 @@
       },
       "maxValue": 5
     },
-    "dataDiskNumber" : {
-      "type" : "int",
+    "dataDiskNumber": {
+      "type": "int",
       "defaultValue": 1,
       "minValue": 1,
       "maxValue": 4,
@@ -32,8 +32,8 @@
         "description": "Number of data disk(s)."
       }
     },
-    "dataDiskSize" : {
-      "type" : "int",
+    "dataDiskSize": {
+      "type": "int",
       "defaultValue": 512,
       "minValue": 32,
       "maxValue": 4095,
@@ -41,7 +41,7 @@
         "description": "Size of each data disk(s)."
       }
     },
-    "jumpBoxSku":  {
+    "jumpBoxSku": {
       "type": "string",
       "defaultValue": "Standard_D2s_v3",
       "metadata": {
@@ -59,6 +59,20 @@
       "metadata": {
         "description": "Admin password on all VMs."
       }
+    },
+    "_artifactsLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+      },
+      "defaultValue": "https://raw.githubusercontent.com/tamhinsf/CockroachDb4Azure/master/"
+    },
+    "_artifactsLocationSasToken": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      },
+      "defaultValue": ""
     }
   },
   "variables": {
@@ -92,9 +106,9 @@
       "version": "latest"
     },
     "imageReference": "[variables('osType')]",
-    "scriptFileName" : "jbox-deploy.sh",
-    "vmssScriptFileName" : "vmss-deploy.sh",
-    "scriptArgs" : ""
+    "scriptFileName": "jbox-deploy.sh",
+    "vmssScriptFileName": "vmss-deploy.sh",
+    "scriptArgs": ""
   },
   "resources": [
     {
@@ -209,52 +223,52 @@
           }
         }
       },
-        "resources" :[
-          {
-            "name": "[concat(variables('jumpBoxName'),'MSILinuxExtension')]",
-            "type": "extensions",
-            "apiVersion": "2017-12-01",
-            "location": "[variables('location')]",
-            "dependsOn": [
-              "[variables('jumpBoxName')]"
-            ],
-            "properties": {
-              "publisher": "Microsoft.ManagedIdentity",
-              "type": "ManagedIdentityExtensionForLinux",
-              "typeHandlerVersion": "1.0",
-              "autoUpgradeMinorVersion": true,
-              "settings": {
-                "port": 50342
-              },
-              "protectedSettings": {}
-            }
-          },
-          {
-            "name": "jboxScript",
-            "type": "extensions",
-            "apiVersion": "2017-03-30",
-            "location": "[variables('location')]",
-            "dependsOn": [
-              "[variables('jumpBoxName')]",
-              "[concat(variables('jumpBoxName'),'MSILinuxExtension')]"
-            ],
-            "properties": {
-              "publisher": "Microsoft.Azure.Extensions",
-              "type": "CustomScript",
-              "typeHandlerVersion": "2.0",
-              "autoUpgradeMinorVersion": true,
-              "settings": {
-                "fileUris": [
-                 "[concat('https://raw.githubusercontent.com/tamhinsf/CockroachDb4Azure/master', concat('/', variables('scriptFileName')))]"              
-                ]
-              },
-              "protectedSettings": {
-                "commandToExecute": "[concat('bash ', variables('scriptFileName'), ' ', variables('scriptArgs'))]"
-              }
+      "resources": [
+        {
+          "name": "[concat(variables('jumpBoxName'),'MSILinuxExtension')]",
+          "type": "extensions",
+          "apiVersion": "2017-12-01",
+          "location": "[variables('location')]",
+          "dependsOn": [
+            "[variables('jumpBoxName')]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.ManagedIdentity",
+            "type": "ManagedIdentityExtensionForLinux",
+            "typeHandlerVersion": "1.0",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "port": 50342
+            },
+            "protectedSettings": {}
+          }
+        },
+        {
+          "name": "jboxScript",
+          "type": "extensions",
+          "apiVersion": "2017-03-30",
+          "location": "[variables('location')]",
+          "dependsOn": [
+            "[variables('jumpBoxName')]",
+            "[concat(variables('jumpBoxName'),'MSILinuxExtension')]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Azure.Extensions",
+            "type": "CustomScript",
+            "typeHandlerVersion": "2.0",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": [
+                "[concat(parameters('_artifactsLocation'), variables('scriptFileName'))]"
+              ]
+            },
+            "protectedSettings": {
+              "commandToExecute": "[concat('bash ', variables('scriptFileName'), ' ', variables('scriptArgs'))]"
             }
           }
-        ]
-      },
+        }
+      ]
+    },
     {
       "type": "Microsoft.Network/loadBalancers",
       "name": "[variables('loadBalancerName')]",
@@ -312,7 +326,7 @@
                 "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/backendAddressPools/', variables('bePoolName'))]"
               },
               "probe": {
-                "id":  "[concat(variables('lbID'), '/probes/dbHealthCheck')]"
+                "id": "[concat(variables('lbID'), '/probes/dbHealthCheck')]"
               }
             }
           },
@@ -334,7 +348,7 @@
                 "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/backendAddressPools/', variables('bePoolName'))]"
               },
               "probe": {
-                "id":  "[concat(variables('lbID'), '/probes/dbHealthCheck')]"
+                "id": "[concat(variables('lbID'), '/probes/dbHealthCheck')]"
               }
             }
           }
@@ -430,8 +444,8 @@
               }
             ]
           },
-          "extensionProfile":{
-            "extensions":[
+          "extensionProfile": {
+            "extensions": [
               {
                 "name": "[concat(variables('namingInfix'),'MSILinuxExtension')]",
                 "properties": {
@@ -440,28 +454,28 @@
                   "typeHandlerVersion": "1.0",
                   "autoUpgradeMinorVersion": true,
                   "settings": {
-                      "port": 50342
+                    "port": 50342
                   }
                 }
               },
               {
-                  "name": "vmssScript",
-                  "properties": {
-                    "publisher": "Microsoft.Azure.Extensions",
-                    "type": "CustomScript",
-                    "typeHandlerVersion": "2.0",
-                    "autoUpgradeMinorVersion": true,
-                    "forceUpdateTag": "true",
-                    "settings": {
-                      "fileUris": [
-                       "[concat('https://raw.githubusercontent.com/tamhinsf/CockroachDb4Azure/master', concat('/', variables('vmssScriptFileName')))]"              
-                      ]
-                    },
-                    "protectedSettings": {
-                      "commandToExecute": "[concat('bash ', variables('vmssScriptFileName'), ' ' , parameters('dataDiskNumber'))]"
-                    }
+                "name": "vmssScript",
+                "properties": {
+                  "publisher": "Microsoft.Azure.Extensions",
+                  "type": "CustomScript",
+                  "typeHandlerVersion": "2.0",
+                  "autoUpgradeMinorVersion": true,
+                  "forceUpdateTag": "true",
+                  "settings": {
+                    "fileUris": [
+                      "[concat(parameters('_artifactsLocation'),variables('vmssScriptFileName'))]"
+                    ]
+                  },
+                  "protectedSettings": {
+                    "commandToExecute": "[concat('bash ', variables('vmssScriptFileName'), ' ' , parameters('dataDiskNumber'))]"
                   }
                 }
+              }
             ]
           }
         }
