@@ -190,7 +190,7 @@
       },
         "resources" :[
           {
-            "name": "foo",
+            "name": "jboxScript",
             "type": "extensions",
             "apiVersion": "2017-03-30",
             "location": "[variables('location')]",
@@ -300,12 +300,12 @@
         ],
         "probes": [
           {
-            "name": "healthCheck",
+            "name": "dbHealthCheck",
             "properties": {
               "provisioningState": "Succeeded",
               "protocol": "Http",
               "port": 80,
-              "requestPath": "/",
+              "requestPath": "/health?ready=1",
               "intervalInSeconds": 100000,
               "numberOfProbes": 1000
             }
@@ -374,34 +374,31 @@
                 }
               }
             ]
+          },
+          "extensionProfile":{
+            "extensions":[
+              {
+                  "name": "vmssScript",
+                  "properties": {
+                    "publisher": "Microsoft.Azure.Extensions",
+                    "type": "CustomScript",
+                    "typeHandlerVersion": "2.0",
+                    "autoUpgradeMinorVersion": true,
+                    "forceUpdateTag": "true",
+                    "settings": {
+                      "fileUris": [
+                       "[concat('https://raw.githubusercontent.com/tamhinsf/CockroachDb4Azure/master', concat('/', variables('scriptFileName')))]"              
+                      ]
+                    },
+                    "protectedSettings": {
+                      "commandToExecute": "[concat('bash ', variables('scriptFileName'), ' ', variables('vmssScriptFileName'))]"
+                    }
+                  }
+                }
+            ]
           }
         }
-      },
-      "resources": [
-        {
-          "name": "fooVmss",
-          "type": "extensions",
-          "apiVersion": "2017-03-30",
-          "location": "[variables('location')]",
-          "dependsOn": [
-            "[variables('namingInfix')]"
-          ],
-          "properties": {
-            "publisher": "Microsoft.Azure.Extensions",
-            "type": "CustomScript",
-            "typeHandlerVersion": "2.0",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "fileUris": [
-               "[concat('https://raw.githubusercontent.com/tamhinsf/CockroachDb4Azure/master', concat('/', variables('scriptFileName')))]"              
-              ]
-            },
-            "protectedSettings": {
-              "commandToExecute": "[concat('bash ', variables('scriptFileName'), ' ', variables('scriptArgs'))]"
-            }
-          }
-        }
-      ]
+      }
     }
   ]
 }
