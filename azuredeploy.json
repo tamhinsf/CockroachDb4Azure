@@ -384,7 +384,7 @@
           "apiVersion": "2017-03-30",
           "location": "[variables('location')]",
           "dependsOn": [
-            "[variables('jumpBoxName')]"
+            "[variables('namingInfix')]"
           ],
           "properties": {
             "publisher": "Microsoft.Azure.Extensions",
