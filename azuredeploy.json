@@ -387,11 +387,11 @@
                     "forceUpdateTag": "true",
                     "settings": {
                       "fileUris": [
-                       "[concat('https://raw.githubusercontent.com/tamhinsf/CockroachDb4Azure/master', concat('/', variables('scriptFileName')))]"              
+                       "[concat('https://raw.githubusercontent.com/tamhinsf/CockroachDb4Azure/master', concat('/', variables('vmssScriptFileName')))]"              
                       ]
                     },
                     "protectedSettings": {
-                      "commandToExecute": "[concat('bash ', variables('scriptFileName'), ' ', variables('vmssScriptFileName'))]"
+                      "commandToExecute": "[concat('bash ', variables('vmssScriptFileName'))]"
                     }
                   }
                 }
