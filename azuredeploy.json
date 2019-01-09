@@ -107,7 +107,9 @@
     },
     "imageReference": "[variables('osType')]",
     "scriptFileName": "jbox-deploy.sh",
+    "jboxScriptUrl" : "[uri(parameters('_artifactsLocation'), concat(variables('scriptFileName'), parameters('_artifactsLocationSasToken')))]",
     "vmssScriptFileName": "vmss-deploy.sh",
+    "vmssScriptUrl" : "[uri(parameters('_artifactsLocation'), concat(variables('vmssScriptFileName'), parameters('_artifactsLocationSasToken')))]",
     "scriptArgs": ""
   },
   "resources": [
@@ -136,7 +138,7 @@
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[variables('jumpBoxNicName')]",
       "location": "[variables('location')]",
-      "apiVersion": "2018-06-01",
+      "apiVersion": "2017-06-01",
       "dependsOn": [
         "[concat('Microsoft.Network/publicIPAddresses/', variables('jumpBoxPublicIPName'))]",
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
@@ -227,7 +229,7 @@
         {
           "name": "[concat(variables('jumpBoxName'),'MSILinuxExtension')]",
           "type": "extensions",
-          "apiVersion": "2017-12-01",
+          "apiVersion": "2018-06-01",
           "location": "[variables('location')]",
           "dependsOn": [
             "[variables('jumpBoxName')]"
@@ -246,7 +248,7 @@
         {
           "name": "jboxScript",
           "type": "extensions",
-          "apiVersion": "2017-03-30",
+          "apiVersion": "2018-06-01",
           "location": "[variables('location')]",
           "dependsOn": [
             "[variables('jumpBoxName')]",
@@ -259,7 +261,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "[concat(parameters('_artifactsLocation'), variables('scriptFileName'))]"
+                "[variables('jboxScriptUrl')]"
               ]
             },
             "protectedSettings": {
@@ -468,7 +470,7 @@
                   "forceUpdateTag": "true",
                   "settings": {
                     "fileUris": [
-                      "[concat(parameters('_artifactsLocation'),variables('vmssScriptFileName'))]"
+                      "[variables('vmssScriptUrl')]"
                     ]
                   },
                   "protectedSettings": {
