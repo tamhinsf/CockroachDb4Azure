@@ -60,14 +60,14 @@
         "description": "Admin password on all VMs."
       }
     },
-    "_artifactsLocation": {
+    "artifactsLocation": {
       "type": "string",
       "metadata": {
         "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
       },
       "defaultValue": "https://raw.githubusercontent.com/tamhinsf/CockroachDb4Azure/master/"
     },
-    "_artifactsLocationSasToken": {
+    "artifactsLocationSasToken": {
       "type": "securestring",
       "metadata": {
         "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
@@ -107,9 +107,9 @@
     },
     "imageReference": "[variables('osType')]",
     "scriptFileName": "jbox-deploy.sh",
-    "jboxScriptUrl" : "[uri(parameters('_artifactsLocation'), concat(variables('scriptFileName'), parameters('_artifactsLocationSasToken')))]",
+    "jboxScriptUrl" : "[concat(parameters('artifactsLocation'),variables('scriptFileName'), parameters('artifactsLocationSasToken'))]",
     "vmssScriptFileName": "vmss-deploy.sh",
-    "vmssScriptUrl" : "[uri(parameters('_artifactsLocation'), concat(variables('vmssScriptFileName'), parameters('_artifactsLocationSasToken')))]",
+    "vmssScriptUrl" : "[concat(parameters('artifactsLocation'), variables('vmssScriptFileName'), parameters('artifactsLocationSasToken'))]",
     "scriptArgs": ""
   },
   "resources": [
