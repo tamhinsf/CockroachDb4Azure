@@ -108,9 +108,9 @@
       "version": "latest"
     },
     "imageReference": "[variables('osType')]",
-    "scriptFileName": "jbox-deploy.sh",
-    "jboxScriptUrl" : "[concat(parameters('artifactsLocation'),variables('scriptFileName'), parameters('artifactsLocationSasToken'))]",
-    "vmssScriptFileName": "vmss-deploy.sh",
+    "scriptFileName": "jumpBoxDeploy.sh",
+    "jumpBoxScriptUrl" : "[concat(parameters('artifactsLocation'),variables('scriptFileName'), parameters('artifactsLocationSasToken'))]",
+    "vmssScriptFileName": "vmssDeploy.sh",
     "vmssScriptUrl" : "[concat(parameters('artifactsLocation'), variables('vmssScriptFileName'), parameters('artifactsLocationSasToken'))]",
     "scriptArgs": ""
   },
@@ -230,7 +230,7 @@
       },
       "resources": [ 
         {
-          "name": "jboxScript",
+          "name": "jumpBoxScript",
           "type": "extensions",
           "apiVersion": "2018-06-01",
           "location": "[variables('location')]",
@@ -245,7 +245,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "[variables('jboxScriptUrl')]"
+                "[variables('jumpBoxScriptUrl')]"
               ]
             },
             "protectedSettings": {
@@ -310,7 +310,6 @@
           {
             "name": "adminUiLbRule",
             "properties": {
-              "provisioningState": "Succeeded",
               "frontendIPConfiguration": {
                 "id": "[variables('frontEndIPConfigID')]"
               },
@@ -332,7 +331,6 @@
           {
             "name": "dbPortRule",
             "properties": {
-              "provisioningState": "Succeeded",
               "frontendIPConfiguration": {
                 "id": "[variables('frontEndIPConfigID')]"
               },
@@ -356,7 +354,6 @@
           {
             "name": "dbHealthCheck",
             "properties": {
-              "provisioningState": "Succeeded",
               "protocol": "Http",
               "port": 80,
               "requestPath": "/health?ready=1",
