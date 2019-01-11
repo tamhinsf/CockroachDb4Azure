@@ -83,6 +83,8 @@
     "jumpBoxIPConfigName": "[concat(variables('jumpBoxName'), 'ipconfig')]",
     "jumpBoxPublicIPName": "[concat(variables('jumpBoxName'), 'pip')]",
     "jumpBoxNicName": "[concat(variables('jumpBoxName'), 'nic')]",
+    "jumpBoxRoleGuid" : "[guid(variables('jumpBoxName'))]",
+    "vmssRoleGuid" : "[guid(variables('namingInfix'))]",
     "addressPrefix": "10.0.0.0/16",
     "subnetPrefix": "10.0.0.0/24",
     "virtualNetworkName": "[concat(variables('namingInfix'), 'vnet')]",
@@ -190,7 +192,8 @@
       "location": "[variables('location')]",
       "apiVersion": "2018-06-01",
       "dependsOn": [
-        "[concat('Microsoft.Network/networkInterfaces/', variables('jumpBoxNicName'))]"
+        "[concat('Microsoft.Network/networkInterfaces/', variables('jumpBoxNicName'))]",
+        "[variables('namingInfix')]"
       ],
       "identity": {
         "type": "SystemAssigned"
@@ -225,26 +228,7 @@
           }
         }
       },
-      "resources": [
-        {
-          "name": "[concat(variables('jumpBoxName'),'MSILinuxExtension')]",
-          "type": "extensions",
-          "apiVersion": "2018-06-01",
-          "location": "[variables('location')]",
-          "dependsOn": [
-            "[variables('jumpBoxName')]"
-          ],
-          "properties": {
-            "publisher": "Microsoft.ManagedIdentity",
-            "type": "ManagedIdentityExtensionForLinux",
-            "typeHandlerVersion": "1.0",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "port": 50342
-            },
-            "protectedSettings": {}
-          }
-        },
+      "resources": [ 
         {
           "name": "jboxScript",
           "type": "extensions",
@@ -252,7 +236,7 @@
           "location": "[variables('location')]",
           "dependsOn": [
             "[variables('jumpBoxName')]",
-            "[concat(variables('jumpBoxName'),'MSILinuxExtension')]"
+            "[variables('jumpBoxRoleGuid')]"
           ],
           "properties": {
             "publisher": "Microsoft.Azure.Extensions",
@@ -270,6 +254,19 @@
           }
         }
       ]
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "name": "[variables('jumpBoxRoleGuid')]",
+      "apiVersion": "2014-10-01-preview",
+      "dependsOn": [
+        "[variables('jumpBoxName')]"  
+      ],
+      "properties": {
+        "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
+        "principalId": "[reference(concat('Microsoft.Compute/virtualMachines/', variables('jumpBoxName')), '2017-03-30', 'Full').identity.principalId]",
+        "scope": "[resourceGroup().id]"
+      }
     },
     {
       "type": "Microsoft.Network/loadBalancers",
@@ -377,8 +374,7 @@
       "apiVersion": "2018-06-01",
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
-        "[variables('jumpBoxName')]"
+        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]"
       ],
       "identity": {
         "type": "SystemAssigned"
@@ -449,18 +445,6 @@
           "extensionProfile": {
             "extensions": [
               {
-                "name": "[concat(variables('namingInfix'),'MSILinuxExtension')]",
-                "properties": {
-                  "publisher": "Microsoft.ManagedIdentity",
-                  "type": "ManagedIdentityExtensionForLinux",
-                  "typeHandlerVersion": "1.0",
-                  "autoUpgradeMinorVersion": true,
-                  "settings": {
-                    "port": 50342
-                  }
-                }
-              },
-              {
                 "name": "vmssScript",
                 "properties": {
                   "publisher": "Microsoft.Azure.Extensions",
@@ -481,6 +465,19 @@
             ]
           }
         }
+      }
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "name": "[variables('vmssRoleGuid')]",
+      "apiVersion": "2014-10-01-preview",
+      "dependsOn": [
+        "[variables('namingInfix')]" 
+      ],
+      "properties": {
+        "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
+        "principalId": "[reference(concat('Microsoft.Compute/virtualMachineScaleSets/', variables('namingInfix')), '2017-03-30', 'Full').identity.principalId]",
+        "scope": "[resourceGroup().id]"
       }
     }
   ]
