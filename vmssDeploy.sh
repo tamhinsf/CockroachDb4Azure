@@ -22,8 +22,6 @@ sudo apt-key --keyring /etc/apt/trusted.gpg.d/Microsoft.gpg adv \
 sudo apt-get update 
 sudo apt-get install azure-cli 
 
-az login --identity  
-
 mkdir $COCKROACHDB_PATH 
 if [ $NUM_OF_DATA_DISKS -eq 1 ]; then
   mkfs -F -t ext4 /dev/sdc 

@@ -192,8 +192,7 @@
       "location": "[variables('location')]",
       "apiVersion": "2018-06-01",
       "dependsOn": [
-        "[concat('Microsoft.Network/networkInterfaces/', variables('jumpBoxNicName'))]",
-        "[variables('namingInfix')]"
+        "[concat('Microsoft.Network/networkInterfaces/', variables('jumpBoxNicName'))]"
       ],
       "identity": {
         "type": "SystemAssigned"
@@ -235,8 +234,7 @@
           "apiVersion": "2018-06-01",
           "location": "[variables('location')]",
           "dependsOn": [
-            "[variables('jumpBoxName')]",
-            "[variables('jumpBoxRoleGuid')]"
+            "[variables('namingInfix')]"
           ],
           "properties": {
             "publisher": "Microsoft.Azure.Extensions",
@@ -384,7 +382,7 @@
       "properties": {
         "overprovision": false,
         "upgradePolicy": {
-          "mode": "Manual"
+          "mode": "Automatic"
         },
         "virtualMachineProfile": {
           "storageProfile": {
