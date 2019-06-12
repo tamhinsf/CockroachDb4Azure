@@ -40,13 +40,22 @@ fi
 mount $COCKROACHDB_PATH
 
 # install coackroach db
-wget -qO- https://binaries.cockroachdb.com/cockroach-v2.1.3.linux-amd64.tgz | tar  xvz 
-cp -i cockroach-v2.1.3.linux-amd64/cockroach /usr/local/bin  
-mkdir /var/lib/cockroach 
-useradd cockroach 
-chown cockroach /var/lib/cockroach 
-chown cockroach $COCKROACHDB_PATH 
-wget -qO- https://raw.githubusercontent.com/cockroachdb/docs/master/_includes/v2.1/prod-deployment/insecurecockroachdb.service > /etc/systemd/system/insecurecockroachdb.service 
+
+wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.1.linux-amd64.tgz | tar  xvz
+cp -i cockroach-v19.1.1.linux-amd64/cockroach /usr/local/bin
+mkdir /var/lib/cockroach
+useradd cockroach
+chown cockroach /var/lib/cockroach
+wget -qO- https://raw.githubusercontent.com/cockroachdb/docs/master/_includes/v19.1/prod-deployment/insecurecockroachdb.service > /etc/systemd/system/
+systemctl start insecurecockroachdb
+
+# wget -qO- https://binaries.cockroachdb.com/cockroach-v2.1.3.linux-amd64.tgz | tar  xvz 
+# cp -i cockroach-v2.1.3.linux-amd64/cockroach /usr/local/bin  
+# mkdir /var/lib/cockroach 
+# useradd cockroach 
+# chown cockroach /var/lib/cockroach 
+# chown cockroach $COCKROACHDB_PATH 
+# wget -qO- https://raw.githubusercontent.com/cockroachdb/docs/master/_includes/v2.1/prod-deployment/insecurecockroachdb.service > /etc/systemd/system/insecurecockroachdb.service 
 
 echo done  
 # Exit script with 0 code to tell Azure that the deployment is done
