@@ -16,10 +16,6 @@ chown cockroach $COCKROACHDB_PATH
 wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.1.linux-amd64.tgz | tar  xvz
 cp -i cockroach-v19.1.1.linux-amd64/cockroach /usr/local/bin
 
-# sudo apt-get install nfs-kernel-server -y >> /tmp/azuredeploy.log.$$ 2>&1
-# echo "/$COCKROACHDB_PATH 10.0.0.0/16(rw)" | sudo tee -a /etc/exports >> /tmp/azuredeploy.log.$$ 2>&1
-# sudo systemctl restart nfs-kernel-server >> /tmp/azuredeploy.log.$$ 2>&1
-
 # install Azure CLI
 sudo apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y 
 AZ_REPO=$(lsb_release -cs) 
