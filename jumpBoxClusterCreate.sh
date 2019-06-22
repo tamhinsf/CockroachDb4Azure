@@ -5,10 +5,6 @@ echo $@
 date 
 whoami 
 
-# install coackroach db
-wget -qO- https://binaries.cockroachdb.com/cockroach-v2.1.3.linux-amd64.tgz | tar  xvz  
-cp -i cockroach-v2.1.3.linux-amd64/cockroach /usr/local/bin  
-
 # install Azure CLI
 sudo apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y 
 AZ_REPO=$(lsb_release -cs) 
@@ -22,3 +18,10 @@ sudo apt-get install azure-cli
 
 # Login to Azure
 az login --identity
+
+# install coackroach db
+wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.1.linux-amd64.tgz | tar  xvz
+cp -i cockroach-v19.1.1.linux-amd64/cockroach /usr/local/bin
+mkdir /var/lib/cockroach
+useradd cockroach
+chown cockroach /var/lib/cockroach

@@ -45,6 +45,7 @@ cp -i cockroach-v19.1.1.linux-amd64/cockroach /usr/local/bin
 mkdir /var/lib/cockroach
 useradd cockroach
 chown cockroach /var/lib/cockroach
+chown -R cockroach:cockroach $COCKROACHDB_PATH
 # wget -qO- https://raw.githubusercontent.com/cockroachdb/docs/master/_includes/v19.1/prod-deployment/insecurecockroachdb.service > /etc/systemd/system/insecurecockroachdb.service 
 # systemctl start insecurecockroachdb
 cockroach start --insecure --listen-addr=`hostname`--join=`hostname` --store=$COCKROACHDB_PATH --background
