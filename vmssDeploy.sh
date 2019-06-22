@@ -47,7 +47,7 @@ useradd cockroach
 chown cockroach /var/lib/cockroach
 # wget -qO- https://raw.githubusercontent.com/cockroachdb/docs/master/_includes/v19.1/prod-deployment/insecurecockroachdb.service > /etc/systemd/system/insecurecockroachdb.service 
 # systemctl start insecurecockroachdb
-cockroach start --insecure --listen-addr='hostname' --background
+cockroach start --insecure --listen-addr=`hostname`--join=`hostname` --store=$COCKROACHDB_PATH --background
 
 echo done  
 # Exit script with 0 code to tell Azure that the deployment is done
