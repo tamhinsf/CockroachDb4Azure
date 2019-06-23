@@ -10,11 +10,14 @@ COCKROACHDB_PATH=/cockroach-data
 
 # Create a file share to help bootstrap the cockroach db cluster
 mkdir $COCKROACHDB_PATH 
-useradd cockroach 
-chown cockroach $COCKROACHDB_PATH 
+chown -R cockroach $COCKROACHDB_PATH 
 
+# install coackroach db
 wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.1.linux-amd64.tgz | tar  xvz
 cp -i cockroach-v19.1.1.linux-amd64/cockroach /usr/local/bin
+mkdir /var/lib/cockroach
+useradd cockroach
+chown cockroach /var/lib/cockroach
 
 # install Azure CLI
 sudo apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y 
