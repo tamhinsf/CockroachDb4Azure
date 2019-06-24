@@ -8,9 +8,6 @@ whoami
 # Store parameters passed to this script
 NUM_OF_DATA_DISKS=${1}
 
-# Set the /cockroach-data data disk path
-COCKROACHDB_PATH=/cockroach-data
-
 # install Azure CLI
 sudo apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y 
 AZ_REPO=$(lsb_release -cs) 
@@ -22,7 +19,10 @@ sudo apt-key --keyring /etc/apt/trusted.gpg.d/Microsoft.gpg adv \
 sudo apt-get update 
 sudo apt-get install azure-cli 
 
+# Set the /cockroach-data data disk path
+COCKROACHDB_PATH=/cockroach-data
 mkdir $COCKROACHDB_PATH 
+
 if [ $NUM_OF_DATA_DISKS -eq 1 ]; then
   mkfs -F -t ext4 /dev/sdc 
   echo "UUID=`blkid -s UUID /dev/sdc | cut -d '"' -f2` $COCKROACHDB_PATH ext4  defaults,discard 0 0" | tee -a /etc/fstab 
@@ -37,6 +37,7 @@ else
   mkfs -F -t ext4 /dev/md0 
   echo "UUID=`blkid -s UUID /dev/md0 | cut -d '"' -f2` $COCKROACHDB_PATH ext4  defaults,discard 0 0" | tee -a /etc/fstab 
 fi
+
 mount $COCKROACHDB_PATH
 
 # install coackroach db
@@ -46,8 +47,8 @@ mkdir /var/lib/cockroach
 useradd cockroach
 chown cockroach /var/lib/cockroach
 chown -R cockroach:cockroach $COCKROACHDB_PATH
-# wget -qO- https://raw.githubusercontent.com/cockroachdb/docs/master/_includes/v19.1/prod-deployment/insecurecockroachdb.service > /etc/systemd/system/insecurecockroachdb.service 
-# systemctl start insecurecockroachdb
+
+# start cockroach db
 cockroach start --insecure --listen-addr=`hostname` --join=`hostname` --store=$COCKROACHDB_PATH --background
 
 echo done  

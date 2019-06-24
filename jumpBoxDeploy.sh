@@ -5,20 +5,6 @@ echo $@
 date 
 whoami 
 
-# Set the /cockroach-data data disk path
-COCKROACHDB_PATH=/cockroach-data
-
-# Create a file share to help bootstrap the cockroach db cluster
-mkdir $COCKROACHDB_PATH 
-chown -R cockroach $COCKROACHDB_PATH 
-
-# install coackroach db
-wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.1.linux-amd64.tgz | tar  xvz
-cp -i cockroach-v19.1.1.linux-amd64/cockroach /usr/local/bin
-mkdir /var/lib/cockroach
-useradd cockroach
-chown cockroach /var/lib/cockroach
-
 # install Azure CLI
 sudo apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y 
 AZ_REPO=$(lsb_release -cs) 
@@ -29,6 +15,18 @@ sudo apt-key --keyring /etc/apt/trusted.gpg.d/Microsoft.gpg adv \
      --recv-keys BC528686B50D79E339D3721CEB3E94ADBE1229CF 
 sudo apt-get update 
 sudo apt-get install azure-cli 
+
+# Set the /cockroach-data data disk path
+COCKROACHDB_PATH=/cockroach-data
+mkdir $COCKROACHDB_PATH 
+
+# install coackroach db
+wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.1.linux-amd64.tgz | tar  xvz
+cp -i cockroach-v19.1.1.linux-amd64/cockroach /usr/local/bin
+mkdir /var/lib/cockroach
+useradd cockroach
+chown cockroach /var/lib/cockroach
+chown -R cockroach:cockroach $COCKROACHDB_PATH
 
 echo done  
 # Exit script with 0 code to tell Azure that the deployment is done
