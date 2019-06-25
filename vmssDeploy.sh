@@ -60,7 +60,7 @@ az login --identity
 AZ_VMSS_ALL_INSTANCE_PRIVATE_IP=
 for PRIVATE_IP in $(az vmss nic list --resource-group $AZ_RG_NAME --vmss-name $AZ_VMSS_NAME --query [].ipConfigurations[].privateIpAddress -o tsv)
 do
-  AZ_VMSS_ALL_INSTANE_PRIVATE_IP=$PRIVATE_IP,$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP
+  AZ_VMSS_ALL_INSTANCE_PRIVATE_IP=$PRIVATE_IP,$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP
 done
 echo $AZ_VMSS_ALL_INSTANCE_PRIVATE_IP
 
