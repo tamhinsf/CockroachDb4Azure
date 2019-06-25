@@ -56,6 +56,9 @@ AZ_VMSS_INSTANCE_PRIVATE_IP=`curl -H Metadata:true "http://169.254.169.254/metad
 # login to azure using managed identity
 az login --identity
 
+# wait until the vmss has been created
+az vmss wait --created --name $AZ_VMSS_NAME --resource-group $AZ_RG_NAME
+
 # get all the nodes in the vmss
 AZ_VMSS_ALL_INSTANCE_PRIVATE_IP=
 for PRIVATE_IP in $(az vmss nic list --resource-group $AZ_RG_NAME --vmss-name $AZ_VMSS_NAME --query [].ipConfigurations[].privateIpAddress -o tsv)
