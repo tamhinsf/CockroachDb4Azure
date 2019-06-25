@@ -41,7 +41,7 @@ fi
 mount $COCKROACHDB_PATH
 
 # install coackroach db
-wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.1.linux-amd64.tgz | tar  xvz
+wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.2.linux-amd64.tgz | tar  xvz
 cp -i cockroach-v19.1.1.linux-amd64/cockroach /usr/local/bin
 mkdir /var/lib/cockroach
 useradd cockroach
@@ -66,7 +66,7 @@ echo $AZ_VMSS_ALL_INSTANCE_PRIVATE_IP
 
 # start cockroach db
 # use the list of vmss in the start script
-cockroach start --insecure --listen-addr=$AZ_VMSS_INSTANCE_PRIVATE_IP --join=$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP --store=$COCKROACHDB_PATH --background
+cockroach start --insecure --advertise-addr=$AZ_VMSS_INSTANCE_PRIVATE_IP --join=$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP --store=$COCKROACHDB_PATH --background
 
 echo done  
 # Exit script with 0 code to tell Azure that the deployment is done
