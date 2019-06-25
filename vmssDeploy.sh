@@ -53,6 +53,10 @@ AZ_VMSS_NAME=`curl -H Metadata:true "http://169.254.169.254/metadata/instance/co
 AZ_RG_NAME=`curl -H Metadata:true "http://169.254.169.254/metadata/instance/compute/resourceGroupName?api-version=2018-10-01&format=text"`
 AZ_VMSS_INSTANCE_PRIVATE_IP=`curl -H Metadata:true "http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0/privateIpAddress?api-version=2018-10-01&format=text"`
 
+echo $AZ_VMSS_NAME  >> /tmp/azuredeploy.log.$$ 2>&1
+echo $AZ_RG_NAME  >> /tmp/azuredeploy.log.$$ 2>&1
+echo $AZ_VMSS_ALL_INSTANCE_PRIVATE_IP  >> /tmp/azuredeploy.log.$$ 2>&1
+
 # login to azure using managed identity
 az login --identity  >> /tmp/azuredeploy.log.$$ 2>&1
 
