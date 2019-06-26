@@ -84,7 +84,8 @@
     "jumpBoxPublicIPName": "[concat(variables('jumpBoxName'), 'pip')]",
     "jumpBoxNicName": "[concat(variables('jumpBoxName'), 'nic')]",
     "jumpBoxRoleGuid" : "[guid(variables('jumpBoxName'))]",
-    "vmssRoleGuid" : "[guid(variables('namingInfix'))]",
+    "vmssUserManagedRoleName" : "[concat(variables('namingInfix'),'-roleName')]",
+    "vmssUserManagedRoleGuid" : "[guid(variables('namingInfix'))]",
     "addressPrefix": "10.3.0.0/16",
     "subnetPrefix": "10.3.0.0/24",
     "virtualNetworkName": "[concat(variables('namingInfix'), 'vnet')]",
@@ -370,10 +371,14 @@
       "apiVersion": "2018-06-01",
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]"
+        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
+        "[variables('jumpBoxName')]"
       ],
       "identity": {
-        "type": "SystemAssigned"
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[resourceID('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('vmssUserManagedRoleName'))]": {}
+      }
       },
       "sku": {
         "name": "[parameters('vmSku')]",
@@ -464,15 +469,22 @@
       }
     },
     {
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "name": "[variables('vmssUserManagedRoleName')]",
+      "apiVersion": "2018-11-30",
+      "location": "[resourceGroup().location]"
+    },
+    {
       "type": "Microsoft.Authorization/roleAssignments",
-      "name": "[variables('vmssRoleGuid')]",
-      "apiVersion": "2014-10-01-preview",
+      "name": "[variables('vmssUserManagedRoleGuid')]",
       "dependsOn": [
-        "[variables('namingInfix')]" 
+        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('vmssUserManagedRoleName'))]",
+        "[variables('jumpBoxName')]"
       ],
+      "apiVersion": "2017-09-01",
       "properties": {
         "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
-        "principalId": "[reference(concat('Microsoft.Compute/virtualMachineScaleSets/', variables('namingInfix')), '2017-03-30', 'Full').identity.principalId]",
+        "principalId":  "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('vmssUserManagedRoleName')), '2018-11-30').principalId]",
         "scope": "[resourceGroup().id]"
       }
     }
