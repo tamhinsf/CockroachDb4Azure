@@ -84,8 +84,8 @@
     "jumpBoxPublicIPName": "[concat(variables('jumpBoxName'), 'pip')]",
     "jumpBoxNicName": "[concat(variables('jumpBoxName'), 'nic')]",
     "jumpBoxRoleGuid" : "[guid(variables('jumpBoxName'))]",
-    "vmssUserManagedRoleName" : "[concat(variables('namingInfix'),'-roleName')]",
-    "vmssUserManagedRoleGuid" : "[guid(variables('namingInfix'))]",
+    "vmssUserManagedIdentityName" : "[concat(variables('namingInfix'),'-userManagedIdentity')]",
+    "vmssUserManagedIdentityRoleGuid" : "[guid(variables('namingInfix'))]",
     "addressPrefix": "10.3.0.0/16",
     "subnetPrefix": "10.3.0.0/24",
     "virtualNetworkName": "[concat(variables('namingInfix'), 'vnet')]",
@@ -371,12 +371,12 @@
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
         "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
-        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('vmssUserManagedRoleName'))]"
+        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('vmssUserManagedIdentityName'))]"
       ],
       "identity": {
         "type": "UserAssigned",
         "userAssignedIdentities": {
-          "[resourceID('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('vmssUserManagedRoleName'))]": {}
+          "[resourceID('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('vmssUserManagedIdentityName'))]": {}
       }
       },
       "sku": {
@@ -469,21 +469,21 @@
     },
     {
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-      "name": "[variables('vmssUserManagedRoleName')]",
+      "name": "[variables('vmssUserManagedIdentityName')]",
       "apiVersion": "2018-11-30",
       "location": "[resourceGroup().location]"
     },
     {
       "type": "Microsoft.Authorization/roleAssignments",
-      "name": "[variables('vmssUserManagedRoleGuid')]",
+      "name": "[variables('vmssUserManagedIdentityRoleGuid')]",
       "dependsOn": [
-        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('vmssUserManagedRoleName'))]",
+        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('vmssUserManagedIdentityName'))]",
         "[variables('jumpBoxName')]"
       ],
       "apiVersion": "2017-09-01",
       "properties": {
         "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
-        "principalId":  "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('vmssUserManagedRoleName')), '2018-11-30').principalId]",
+        "principalId":  "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('vmssUserManagedIdentityName')), '2018-11-30').principalId]",
         "scope": "[resourceGroup().id]"
       }
     }
