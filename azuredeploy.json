@@ -235,8 +235,7 @@
           "apiVersion": "2018-06-01",
           "location": "[variables('location')]",
           "dependsOn": [
-            "[variables('jumpBoxName')]",
-            "[variables('namingInfix')]"
+            "[variables('jumpBoxName')]"
           ],
           "properties": {
             "publisher": "Microsoft.Azure.Extensions",
@@ -372,7 +371,7 @@
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
         "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
-        "[variables('jumpBoxName')]"
+        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('vmssUserManagedRoleName'))]"
       ],
       "identity": {
         "type": "UserAssigned",
