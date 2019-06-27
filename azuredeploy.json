@@ -78,27 +78,25 @@
   "variables": {
     "location": "[resourceGroup().location]",
     "namingInfix": "[toLower(substring(concat(parameters('vmssName'), uniqueString(resourceGroup().id)), 0, 9))]",
+    "keyVaultName": "[concat(toLower(substring(concat(resourceGroup().name,uniqueString(resourceGroup().id)), 0, 9)),'keyvault')]",
+    "tenantId": "[subscription().tenantId]",
     "jumpBoxName": "[concat(variables('namingInfix'), 'jbox')]",
     "jumpBoxOSDiskName": "[concat(variables('jumpBoxName'), 'osdisk')]",
     "jumpBoxIPConfigName": "[concat(variables('jumpBoxName'), 'ipconfig')]",
     "jumpBoxPublicIPName": "[concat(variables('jumpBoxName'), 'pip')]",
     "jumpBoxNicName": "[concat(variables('jumpBoxName'), 'nic')]",
-    "jumpBoxRoleGuid" : "[guid(variables('jumpBoxName'))]",
-    "vmssUserManagedIdentityName" : "[concat(variables('namingInfix'),'-userManagedIdentity')]",
-    "vmssUserManagedIdentityRoleGuid" : "[guid(variables('namingInfix'))]",
+    "rgUserManagedIdentityName" : "[concat(variables('namingInfix'),'-userManagedIdentity')]",
+    "rgUserManagedIdentityRoleGuid" : "[guid(variables('namingInfix'))]",
     "addressPrefix": "10.3.0.0/16",
     "subnetPrefix": "10.3.0.0/24",
     "virtualNetworkName": "[concat(variables('namingInfix'), 'vnet')]",
+    "nsgName" : "[concat(resourceGroup().name,'nsg')]",
     "subnetName": "[concat(variables('namingInfix'), 'subnet')]",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
     "loadBalancerName": "[concat(variables('namingInfix'), 'lb')]",
     "lbID": "[resourceId('Microsoft.Network/loadBalancers',variables('loadBalancerName'))]",
     "lbPublicIPName": "[concat(variables('loadBalancerName'), 'pip')]",
-    "natPoolName": "[concat(variables('namingInfix'), 'natpool')]",
     "bePoolName": "[concat(variables('namingInfix'), 'bepool')]",
-    "natStartPort": 50000,
-    "natEndPort": 50119,
-    "natBackendPort": 22,
     "nicName": "[concat(variables('namingInfix'), 'nic')]",
     "ipConfigName": "[concat(variables('namingInfix'), 'ipconfig')]",
     "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/loadBalancerFrontEnd')]",
@@ -113,10 +111,47 @@
     "jumpBoxScriptUrl" : "[concat(parameters('_artifactsLocation'),variables('scriptFileName'), parameters('_artifactsLocationSasToken'))]",
     "vmssScriptFileName": "vmssDeploy.sh",
     "vmssScriptUrl" : "[concat(parameters('_artifactsLocation'), variables('vmssScriptFileName'), parameters('_artifactsLocationSasToken'))]",
+    "vmssCrdbStartupScriptFileName": "vmssCrdbStartup.sh",
+    "vmssCrdbStartupScriptUrl" : "[concat(parameters('_artifactsLocation'), variables('vmssScriptFileName'), parameters('_artifactsLocationSasToken'))]",   
     "scriptArgs": ""
   },
   "resources": [
     {
+      "type": "Microsoft.KeyVault/vaults",
+      "name": "[variables('keyVaultName')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('rgUserManagedIdentityName'))]",
+        "jumpBoxScript"
+      ],
+      "apiVersion": "2016-10-01",
+      "properties": {
+        "enabledForDeployment": true,
+        "enabledForTemplateDeployment": true,
+        "accessPolicies": [
+          {
+            "objectId": "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('rgUserManagedIdentityName')), '2018-11-30').principalId]",
+            "tenantId": "[variables('tenantId')]",
+            "permissions": {
+              "secrets": [
+                "get",
+                "list",
+                "set",
+                "delete",
+                "recover",
+                "backup",
+                "restore"
+              ]
+            }
+          }
+        ],
+        "tenantId": "[variables('tenantId')]",
+        "sku": {
+          "name": "standard",
+          "family": "A"
+        }
+      }
+    },    {
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('virtualNetworkName')]",
       "location": "[variables('location')]",
@@ -176,12 +211,51 @@
       }
     },
     {
+      "apiVersion": "2017-06-01",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('nsgName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "allowCrdb26257",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "26257",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "[variables('subnetPrefix')]",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "allowHttp8080",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "8080",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "[variables('subnetPrefix')]",
+              "access": "Allow",
+              "priority": 101,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[variables('lbPublicIPName')]",
       "location": "[variables('location')]",
-      "apiVersion": "2017-06-01",
+      "apiVersion": "2018-10-01",
+      "sku": {
+        "name": "Standard"
+      },
       "properties": {
-        "publicIPAllocationMethod": "Dynamic",
+        "publicIPAllocationMethod": "Static",
         "dnsSettings": {
           "domainNameLabel": "[variables('loadBalancerName')]"
         }
@@ -193,10 +267,14 @@
       "location": "[variables('location')]",
       "apiVersion": "2018-06-01",
       "dependsOn": [
-        "[concat('Microsoft.Network/networkInterfaces/', variables('jumpBoxNicName'))]"
+        "[concat('Microsoft.Network/networkInterfaces/', variables('jumpBoxNicName'))]",
+        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('rgUserManagedIdentityName'))]"
       ],
-      "identity": {
-        "type": "SystemAssigned"
+      "identity" :{
+        "type": "UserAssigned",
+        "userAssignedIdentities":{
+          "[resourceID('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('rgUserManagedIdentityName'))]": {}
+        }
       },
       "properties": {
         "hardwareProfile": {
@@ -255,23 +333,13 @@
       ]
     },
     {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "name": "[variables('jumpBoxRoleGuid')]",
-      "apiVersion": "2014-10-01-preview",
-      "dependsOn": [
-        "[variables('jumpBoxName')]"  
-      ],
-      "properties": {
-        "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
-        "principalId": "[reference(concat('Microsoft.Compute/virtualMachines/', variables('jumpBoxName')), '2017-03-30', 'Full').identity.principalId]",
-        "scope": "[resourceGroup().id]"
-      }
-    },
-    {
       "type": "Microsoft.Network/loadBalancers",
       "name": "[variables('loadBalancerName')]",
       "location": "[variables('location')]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2018-08-01",
+      "sku": {
+        "name": "Standard"
+      },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
       ],
@@ -291,21 +359,7 @@
             "name": "[variables('bePoolName')]"
           }
         ],
-        "inboundNatPools": [
-          {
-            "name": "[variables('natPoolName')]",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('frontEndIPConfigID')]"
-              },
-              "protocol": "tcp",
-              "frontendPortRangeStart": "[variables('natStartPort')]",
-              "frontendPortRangeEnd": "[variables('natEndPort')]",
-              "backendPort": "[variables('natBackendPort')]"
-            }
-          }
-        ],
-        "loadBalancingRules": [
+        "loadBalancingRules": [        
           {
             "name": "adminUiLbRule",
             "properties": {
@@ -354,10 +408,10 @@
             "name": "dbHealthCheck",
             "properties": {
               "protocol": "Http",
-              "port": 80,
+              "port": 8080,
               "requestPath": "/health?ready=1",
-              "intervalInSeconds": 100000,
-              "numberOfProbes": 1000
+              "intervalInSeconds": 10,
+              "numberOfProbes": 100000
             }
           }
         ]
@@ -371,12 +425,14 @@
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
         "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
-        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('vmssUserManagedIdentityName'))]"
+        "[concat('Microsoft.Network/networkSecurityGroups/',variables('nsgName'))]",
+        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('rgUserManagedIdentityName'))]",
+        "jumpBoxScript"
       ],
       "identity": {
         "type": "UserAssigned",
         "userAssignedIdentities": {
-          "[resourceID('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('vmssUserManagedIdentityName'))]": {}
+          "[resourceID('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('rgUserManagedIdentityName'))]": {}
       }
       },
       "sku": {
@@ -385,7 +441,7 @@
         "capacity": "[parameters('instanceCount')]"
       },
       "properties": {
-        "overprovision": false,
+        "overprovision": true,
         "upgradePolicy": {
           "mode": "Automatic"
         },
@@ -429,15 +485,13 @@
                           {
                             "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/backendAddressPools/', variables('bePoolName'))]"
                           }
-                        ],
-                        "loadBalancerInboundNatPools": [
-                          {
-                            "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatPools/', variables('natPoolName'))]"
-                          }
                         ]
                       }
                     }
-                  ]
+                  ],
+                  "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('nsgName'))]"
+                  }
                 }
               }
             ]
@@ -445,7 +499,7 @@
           "extensionProfile": {
             "extensions": [
               {
-                "name": "vmssScript",
+                "name": "vmssDeploy",
                 "properties": {
                   "publisher": "Microsoft.Azure.Extensions",
                   "type": "CustomScript",
@@ -461,6 +515,27 @@
                     "commandToExecute": "[concat('bash ', variables('vmssScriptFileName'), ' ' , parameters('dataDiskNumber'))]"
                   }
                 }
+              },
+              {
+                "name": "vmssCrdbStartup",
+                "properties": {
+                  "publisher": "Microsoft.Azure.Extensions",
+                  "provisionAfterExtensions" : [
+                    "vmssDeploy"
+                  ],
+                  "type": "CustomScript",
+                  "typeHandlerVersion": "2.0",
+                  "autoUpgradeMinorVersion": true,
+                  "forceUpdateTag": "true",
+                  "settings": {
+                    "fileUris": [
+                      "[variables('vmssCrdbStartupScriptUrl')]"
+                    ]
+                  },
+                  "protectedSettings": {
+                    "commandToExecute": "[concat('bash ', variables('vmssCrdbStartupScriptFileName'))]"
+                  }
+                }
               }
             ]
           }
@@ -469,21 +544,21 @@
     },
     {
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-      "name": "[variables('vmssUserManagedIdentityName')]",
+      "name": "[variables('rgUserManagedIdentityName')]",
       "apiVersion": "2018-11-30",
       "location": "[resourceGroup().location]"
     },
     {
       "type": "Microsoft.Authorization/roleAssignments",
-      "name": "[variables('vmssUserManagedIdentityRoleGuid')]",
+      "name": "[variables('rgUserManagedIdentityRoleGuid')]",
       "dependsOn": [
-        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('vmssUserManagedIdentityName'))]",
-        "[variables('jumpBoxName')]"
+        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('rgUserManagedIdentityName'))]",
+        "jumpBoxScript"
       ],
       "apiVersion": "2017-09-01",
       "properties": {
         "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
-        "principalId":  "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('vmssUserManagedIdentityName')), '2018-11-30').principalId]",
+        "principalId":  "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('rgUserManagedIdentityName')), '2018-11-30').principalId]",
         "scope": "[resourceGroup().id]"
       }
     }
