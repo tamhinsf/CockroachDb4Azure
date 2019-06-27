@@ -19,8 +19,8 @@ sudo apt-key --keyring /etc/apt/trusted.gpg.d/Microsoft.gpg adv \
 sudo apt-get update 
 sudo apt-get install azure-cli 
 
-# Set the /cockroach-data data disk path
-COCKROACHDB_PATH=/cockroach-data
+# Set the variable COCKROACHDB_PATH to the default, re-use it in this script 
+COCKROACHDB_PATH=/var/lib/cockroach
 mkdir $COCKROACHDB_PATH 
 
 if [ $NUM_OF_DATA_DISKS -eq 1 ]; then
@@ -43,10 +43,8 @@ mount $COCKROACHDB_PATH
 # install coackroach db
 wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.2.linux-amd64.tgz | tar  xvz
 cp -i cockroach-v19.1.2.linux-amd64/cockroach /usr/local/bin
-mkdir /var/lib/cockroach
 useradd cockroach
 chown cockroach /var/lib/cockroach
-chown -R cockroach:cockroach $COCKROACHDB_PATH
 
 echo done  
 # Exit script with 0 code to tell Azure that the deployment is done

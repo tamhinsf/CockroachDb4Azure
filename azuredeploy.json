@@ -112,7 +112,7 @@
     "vmssScriptFileName": "vmssDeploy.sh",
     "vmssScriptUrl" : "[concat(parameters('_artifactsLocation'), variables('vmssScriptFileName'), parameters('_artifactsLocationSasToken'))]",
     "vmssCrdbStartupScriptFileName": "vmssCrdbStartup.sh",
-    "vmssCrdbStartupScriptUrl" : "[concat(parameters('_artifactsLocation'), variables('vmssScriptFileName'), parameters('_artifactsLocationSasToken'))]",   
+    "vmssCrdbStartupScriptUrl" : "[concat(parameters('_artifactsLocation'), variables('vmssCrdbStartupScriptFileName'), parameters('_artifactsLocationSasToken'))]",   
     "scriptArgs": ""
   },
   "resources": [
@@ -508,32 +508,12 @@
                   "forceUpdateTag": "true",
                   "settings": {
                     "fileUris": [
-                      "[variables('vmssScriptUrl')]"
-                    ]
-                  },
-                  "protectedSettings": {
-                    "commandToExecute": "[concat('bash ', variables('vmssScriptFileName'), ' ' , parameters('dataDiskNumber'))]"
-                  }
-                }
-              },
-              {
-                "name": "vmssCrdbStartup",
-                "properties": {
-                  "publisher": "Microsoft.Azure.Extensions",
-                  "provisionAfterExtensions" : [
-                    "vmssDeploy"
-                  ],
-                  "type": "CustomScript",
-                  "typeHandlerVersion": "2.0",
-                  "autoUpgradeMinorVersion": true,
-                  "forceUpdateTag": "true",
-                  "settings": {
-                    "fileUris": [
+                      "[variables('vmssScriptUrl')]",
                       "[variables('vmssCrdbStartupScriptUrl')]"
                     ]
                   },
                   "protectedSettings": {
-                    "commandToExecute": "[concat('bash ', variables('vmssCrdbStartupScriptFileName'))]"
+                    "commandToExecute": "[concat('bash ', variables('vmssScriptFileName'), ' ' , parameters('dataDiskNumber'), ' ',';', 'bash ', variables('vmssCrdbStartupScriptFileName'))]"
                   }
                 }
               }

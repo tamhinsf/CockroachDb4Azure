@@ -16,7 +16,7 @@ echo $AZ_VMSS_ALL_INSTANCE_PRIVATE_IP
 
 # start cockroach db
 # use the list of vmss in the start script
-cockroach start --insecure --advertise-addr=$AZ_VMSS_INSTANCE_PRIVATE_IP --join=$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP --store=$COCKROACHDB_PATH --background
+cockroach start --insecure --advertise-addr=$AZ_VMSS_INSTANCE_PRIVATE_IP --join=$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP --background
 
 echo done  
 # Exit script with 0 code to tell Azure that the deployment is done
