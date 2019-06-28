@@ -7,6 +7,7 @@ whoami
 
 # Store parameters passed to this script
 NUM_OF_DATA_DISKS=${1}
+KEYVAULT_NAME=${2}
 
 # install Azure CLI
 sudo apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y 
@@ -45,6 +46,10 @@ wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.2.linux-amd64.tgz | t
 cp -i cockroach-v19.1.2.linux-amd64/cockroach /usr/local/bin
 useradd cockroach
 chown cockroach /var/lib/cockroach
+
+# login to azure using managed identity
+az login --identity 
+az keyvault secret show --vault-name $KEYVAULT_NAME -n crdbkey | jq -r .value > $COCKROACHDB_PATH/crdb.key
 
 echo done  
 # Exit script with 0 code to tell Azure that the deployment is done

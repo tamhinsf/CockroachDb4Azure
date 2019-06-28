@@ -5,6 +5,9 @@ echo $@
 date 
 whoami 
 
+# Store parameters passed to this script
+KEYVAULT_NAME=${1}
+
 # install Azure CLI
 sudo apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y 
 AZ_REPO=$(lsb_release -cs) 
@@ -26,6 +29,10 @@ cp -i cockroach-v19.1.2.linux-amd64/cockroach /usr/local/bin
 mkdir /var/lib/cockroach
 useradd cockroach
 chown cockroach /var/lib/cockroach
+
+cockroach cert create-ca --certs-dir=certs --ca-key=$COCKROACHDB_PATH/crdbkey.key
+az login --identity
+az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbkey -f $COCKROACHDB_PATH/crdbkey.key
 
 echo done  
 # Exit script with 0 code to tell Azure that the deployment is done

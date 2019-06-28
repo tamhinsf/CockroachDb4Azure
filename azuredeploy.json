@@ -113,7 +113,7 @@
     "vmssScriptUrl" : "[concat(parameters('_artifactsLocation'), variables('vmssScriptFileName'), parameters('_artifactsLocationSasToken'))]",
     "vmssCrdbStartupScriptFileName": "vmssCrdbStartup.sh",
     "vmssCrdbStartupScriptUrl" : "[concat(parameters('_artifactsLocation'), variables('vmssCrdbStartupScriptFileName'), parameters('_artifactsLocationSasToken'))]",   
-    "scriptArgs": ""
+    "scriptArgs": "[variables('keyVaultName')]"
   },
   "resources": [
     {
@@ -121,8 +121,7 @@
       "name": "[variables('keyVaultName')]",
       "location": "[variables('location')]",
       "dependsOn": [
-        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('rgUserManagedIdentityName'))]",
-        "jumpBoxScript"
+        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('rgUserManagedIdentityName'))]"
       ],
       "apiVersion": "2016-10-01",
       "properties": {
@@ -268,7 +267,7 @@
       "apiVersion": "2018-06-01",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', variables('jumpBoxNicName'))]",
-        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('rgUserManagedIdentityName'))]"
+        "[variables('rgUserManagedIdentityRoleGuid')]"
       ],
       "identity" :{
         "type": "UserAssigned",
@@ -426,7 +425,6 @@
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
         "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
         "[concat('Microsoft.Network/networkSecurityGroups/',variables('nsgName'))]",
-        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('rgUserManagedIdentityName'))]",
         "jumpBoxScript"
       ],
       "identity": {
@@ -532,8 +530,8 @@
       "type": "Microsoft.Authorization/roleAssignments",
       "name": "[variables('rgUserManagedIdentityRoleGuid')]",
       "dependsOn": [
-        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('rgUserManagedIdentityName'))]",
-        "jumpBoxScript"
+        "[variables('keyVaultName')]",
+        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('rgUserManagedIdentityName'))]"
       ],
       "apiVersion": "2017-09-01",
       "properties": {
