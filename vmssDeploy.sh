@@ -1,14 +1,6 @@
-# Log parameters passed to this script. 
-echo $@ 
-
-# Basic info
-date 
-whoami 
-
 # Store parameters passed to this script
 NUM_OF_DATA_DISKS=${1}
 KEYVAULT_NAME=${2}
-echo $KEYVAULT_NAME
 
 # install Azure CLI
 sudo apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y 

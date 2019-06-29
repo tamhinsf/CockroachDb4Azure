@@ -1,13 +1,5 @@
-# Log parameters passed to this script. 
-echo $@ 
-
-# Basic info
-date 
-whoami 
-
 # Store parameters passed to this script
 KEYVAULT_NAME=${1}
-echo $KEYVAULT_NAME
 
 # install Azure CLI
 sudo apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y 
@@ -43,13 +35,17 @@ sudo apt install jq -y
 # generate the private key
 chmod -R go-rwx $COCKROACHDB_CERTS_PATH
 cockroach cert create-ca --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key
-chmod go-rwx $COCKROACHDB_CERTS_PATH/ca.key
-chmod go-rwx $COCKROACHDB_CERTS_PATH/ca.crt 
+
+# make a cert for the root user so we can connect later on
+cockroach cert create-client root --certs-dir=COCKROACHDB_CERTS_PATH --ca-key=COCKROACHDB_CERTS_PATH/ca.key
 
 # put the private key into keyvault
 az login --identity
 az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbkey -f $COCKROACHDB_CERTS_PATH/ca.key
 az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbcrt -f $COCKROACHDB_CERTS_PATH/ca.crt
+
+# secure the folder contents
+chmod go-rwx $COCKROACHDB_CERTS_PATH/*
 
 echo done  
 # Exit script with 0 code to tell Azure that the deployment is done

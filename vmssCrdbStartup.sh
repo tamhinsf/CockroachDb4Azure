@@ -26,10 +26,20 @@ az keyvault secret show --vault-name `cat $COCKROACHDB_CERTS_PATH/keyvault.name`
 # create a certificate for the local machine
 cockroach cert create-node $AZ_VMSS_INSTANCE_PRIVATE_IP `hostname` localhost 127.0.0.1 --certs-dir $COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key
 
+# remove the key file that was downloaded
+rm $COCKROACHDB_CERTS_PATH/ca.key
+
+# secure the folder contents
+chmod go-rwx $COCKROACHDB_CERTS_PATH/*
+
 # start cockroach db
 # use the list of vmss in the start script
+
+# insecure startup
 #cockroach start --insecure --advertise-addr=$AZ_VMSS_INSTANCE_PRIVATE_IP --join=$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP --store=/cockroach-data --background 
-cockroach start --certs-dir $COCKROACHDB_CERTS_PATH --advertise-addr=$AZ_VMSS_INSTANCE_PRIVATE_IP --join=$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP --store=/cockroach-data --background 
+
+# secure startup with certs
+cockroach start --certs-dir $COCKROACHDB_CERTS_PATH --advertise-addr=$AZ_VMSS_INSTANCE_PRIVATE_IP --join=$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP --store=$COCKROACHDB_PATH --background 
 
 echo done  # Exit script with 0 code to tell Azure that the deployment is done
 exit 0 
