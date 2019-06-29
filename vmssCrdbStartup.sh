@@ -18,7 +18,7 @@ COCKROACHDB_PATH=/cockroach-data
 COCKROACHDB_CERTS_PATH=$COCKROACHDB_PATH/certs
 chmod -R go-rwx $COCKROACHDB_CERTS_PATH
 
-az keyvault secret show --vault-name $KEYVAULT_NAME -n `cat $COCKROACHDB_CERTS_PATH/keyvault.name` | jq -r .value > $COCKROACHDB_CERTS_PATH/ca.key
+az keyvault secret show --vault-name `cat $COCKROACHDB_CERTS_PATH/keyvault.name` -n crdbkey | jq -r .value > $COCKROACHDB_CERTS_PATH/ca.key
 
 # create a certificate for the local machine
 cockroach cert create-node $AZ_VMSS_INSTANCE_PRIVATE_IP `hostname` localhost 127.0.0.1 --certs-dir $COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key
