@@ -423,7 +423,6 @@
       "location": "[variables('location')]",
       "apiVersion": "2018-06-01",
       "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
         "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
         "[concat('Microsoft.Network/networkSecurityGroups/',variables('nsgName'))]",
         "jumpBoxScript"

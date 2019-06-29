@@ -37,7 +37,7 @@ chmod -R go-rwx $COCKROACHDB_CERTS_PATH
 cockroach cert create-ca --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key
 
 # make a cert for the root user so we can connect later on
-cockroach cert create-client root --certs-dir=COCKROACHDB_CERTS_PATH --ca-key=COCKROACHDB_CERTS_PATH/ca.key
+cockroach cert create-client root --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key
 
 # put the private key into keyvault
 az login --identity
