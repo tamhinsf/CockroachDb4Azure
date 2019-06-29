@@ -21,7 +21,7 @@ sudo apt-get update
 sudo apt-get install azure-cli 
 
 # Set the variable COCKROACHDB_PATH to the default, re-use it in this script 
-COCKROACHDB_PATH=/var/lib/cockroach
+COCKROACHDB_PATH=/cockroach-data
 mkdir $COCKROACHDB_PATH 
 
 if [ $NUM_OF_DATA_DISKS -eq 1 ]; then
@@ -46,10 +46,15 @@ wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.2.linux-amd64.tgz | t
 cp -i cockroach-v19.1.2.linux-amd64/cockroach /usr/local/bin
 useradd cockroach
 chown cockroach /var/lib/cockroach
+chown -R cockroach:cockroach $COCKROACHDB_PATH
 
-# login to azure using managed identity
-az login --identity 
-az keyvault secret show --vault-name $KEYVAULT_NAME -n crdbkey | jq -r .value > $COCKROACHDB_PATH/crdb.key
+# prep for cockroach db certs
+COCKROACHDB_CERTS_PATH=$COCKROACHDB_PATH/certs
+mkdir $COCKROACHDB_CERTS_PATH
+chmod -R go-rwx $COCKROACHDB_CERTS_PATH
+
+# install jq
+sudo apt install jq -y
 
 echo done  
 # Exit script with 0 code to tell Azure that the deployment is done

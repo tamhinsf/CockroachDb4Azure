@@ -14,9 +14,19 @@ do
 done
 echo $AZ_VMSS_ALL_INSTANCE_PRIVATE_IP
 
+COCKROACHDB_PATH=/cockroach-data
+COCKROACHDB_CERTS_PATH=$COCKROACHDB_PATH/certs
+chmod -R go-rwx $COCKROACHDB_CERTS_PATH
+
+az keyvault secret show --vault-name $KEYVAULT_NAME -n crdbkey | jq -r .value > $COCKROACHDB_CERTS_PATH/ca.key
+
+# create a certificate for the local machine
+cockroach cert create-node $AZ_VMSS_INSTANCE_PRIVATE_IP `hostname` localhost 127.0.0.1 --certs-dir $COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key
+
 # start cockroach db
 # use the list of vmss in the start script
-cockroach start --insecure --advertise-addr=$AZ_VMSS_INSTANCE_PRIVATE_IP --join=$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP --background
+#cockroach start --insecure --advertise-addr=$AZ_VMSS_INSTANCE_PRIVATE_IP --join=$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP --store=/cockroach-data --background 
+cockroach start --certs-dir $COCKROACHDB_CERTS_PATH --advertise-addr=$AZ_VMSS_INSTANCE_PRIVATE_IP --join=$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP --store=/cockroach-data --background 
 
 echo done  
 # Exit script with 0 code to tell Azure that the deployment is done

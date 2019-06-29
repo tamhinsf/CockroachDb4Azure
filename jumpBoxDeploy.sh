@@ -20,7 +20,7 @@ sudo apt-get update
 sudo apt-get install azure-cli 
 
 # Set the variable COCKROACHDB_PATH to the default, re-use it in this script 
-COCKROACHDB_PATH=/var/lib/cockroach
+COCKROACHDB_PATH=/cockroach-data
 mkdir $COCKROACHDB_PATH 
 
 # install coackroach db
@@ -29,10 +29,25 @@ cp -i cockroach-v19.1.2.linux-amd64/cockroach /usr/local/bin
 mkdir /var/lib/cockroach
 useradd cockroach
 chown cockroach /var/lib/cockroach
+chown -R cockroach:cockroach $COCKROACHDB_PATH
 
-cockroach cert create-ca --certs-dir=certs --ca-key=$COCKROACHDB_PATH/crdbkey.key
+# prep for cockroach db certs
+COCKROACHDB_CERTS_PATH=$COCKROACHDB_PATH/certs
+mkdir $COCKROACHDB_CERTS_PATH
+chmod -R go-rwx $COCKROACHDB_CERTS_PATH
+
+# install jq
+sudo apt install jq -y
+
+# generate the private key
+chmod -R go-rwx $COCKROACHDB_CERTS_PATH
+touch $COCKROACHDB_CERTS_PATH/ca.key
+chmod go-rwx $COCKROACHDB_CERTS_PATH/ca.key
+cockroach cert create-ca --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key
+
+# put the private key into keyvault
 az login --identity
-az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbkey -f $COCKROACHDB_PATH/crdbkey.key
+az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbkey -f $COCKROACHDB_CERTS_PATH/ca.key
 
 echo done  
 # Exit script with 0 code to tell Azure that the deployment is done
