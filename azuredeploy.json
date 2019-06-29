@@ -267,7 +267,7 @@
       "apiVersion": "2018-06-01",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', variables('jumpBoxNicName'))]",
-        "[variables('rgUserManagedIdentityRoleGuid')]"
+        "[variables('rgUserManagedIdentityName')]"
       ],
       "identity" :{
         "type": "UserAssigned",
@@ -312,7 +312,8 @@
           "apiVersion": "2018-06-01",
           "location": "[variables('location')]",
           "dependsOn": [
-            "[variables('jumpBoxName')]"
+            "[variables('jumpBoxName')]",
+            "[variables('rgUserManagedIdentityRoleGuid')]"
           ],
           "properties": {
             "publisher": "Microsoft.Azure.Extensions",
@@ -530,8 +531,8 @@
       "type": "Microsoft.Authorization/roleAssignments",
       "name": "[variables('rgUserManagedIdentityRoleGuid')]",
       "dependsOn": [
-        "[variables('keyVaultName')]",
-        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('rgUserManagedIdentityName'))]"
+        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('rgUserManagedIdentityName'))]",
+        "[variables('jumpBoxName')]"
       ],
       "apiVersion": "2017-09-01",
       "properties": {

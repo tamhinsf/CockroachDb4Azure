@@ -44,10 +44,12 @@ sudo apt install jq -y
 chmod -R go-rwx $COCKROACHDB_CERTS_PATH
 cockroach cert create-ca --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key
 chmod go-rwx $COCKROACHDB_CERTS_PATH/ca.key
+chmod go-rwx $COCKROACHDB_CERTS_PATH/ca.crt 
 
 # put the private key into keyvault
 az login --identity
 az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbkey -f $COCKROACHDB_CERTS_PATH/ca.key
+az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbcrt -f $COCKROACHDB_CERTS_PATH/ca.key
 
 echo done  
 # Exit script with 0 code to tell Azure that the deployment is done
