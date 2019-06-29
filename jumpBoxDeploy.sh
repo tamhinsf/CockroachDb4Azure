@@ -49,7 +49,7 @@ chmod go-rwx $COCKROACHDB_CERTS_PATH/ca.crt
 # put the private key into keyvault
 az login --identity
 az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbkey -f $COCKROACHDB_CERTS_PATH/ca.key
-az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbcrt -f $COCKROACHDB_CERTS_PATH/ca.key
+az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbcrt -f $COCKROACHDB_CERTS_PATH/ca.crt
 
 echo done  
 # Exit script with 0 code to tell Azure that the deployment is done

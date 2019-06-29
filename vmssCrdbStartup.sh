@@ -31,6 +31,5 @@ cockroach cert create-node $AZ_VMSS_INSTANCE_PRIVATE_IP `hostname` localhost 127
 #cockroach start --insecure --advertise-addr=$AZ_VMSS_INSTANCE_PRIVATE_IP --join=$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP --store=/cockroach-data --background 
 cockroach start --certs-dir $COCKROACHDB_CERTS_PATH --advertise-addr=$AZ_VMSS_INSTANCE_PRIVATE_IP --join=$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP --store=/cockroach-data --background 
 
-echo done  
-# Exit script with 0 code to tell Azure that the deployment is done
+echo done  # Exit script with 0 code to tell Azure that the deployment is done
 exit 0 
