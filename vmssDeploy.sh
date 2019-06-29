@@ -52,6 +52,7 @@ chown -R cockroach:cockroach $COCKROACHDB_PATH
 COCKROACHDB_CERTS_PATH=$COCKROACHDB_PATH/certs
 mkdir $COCKROACHDB_CERTS_PATH
 chmod -R go-rwx $COCKROACHDB_CERTS_PATH
+echo $KEYVAULT_NAME > $COCKROACHDB_CERTS_PATH/keyvault.name
 
 # install jq
 sudo apt install jq -y
