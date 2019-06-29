@@ -78,7 +78,7 @@
   "variables": {
     "location": "[resourceGroup().location]",
     "namingInfix": "[toLower(substring(concat(parameters('vmssName'), uniqueString(resourceGroup().id)), 0, 9))]",
-    "keyVaultName": "[concat(toLower(substring(concat(resourceGroup().name,uniqueString(resourceGroup().id)), 0, 9)),'keyvault')]",
+    "keyVaultName": "[concat(toLower(substring(concat(resourceGroup().name,uniqueString(resourceGroup().id)), 0, 9)),'-crdbkv')]",
     "tenantId": "[subscription().tenantId]",
     "jumpBoxName": "[concat(variables('namingInfix'), 'jbox')]",
     "jumpBoxOSDiskName": "[concat(variables('jumpBoxName'), 'osdisk')]",

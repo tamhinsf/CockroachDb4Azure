@@ -7,6 +7,7 @@ whoami
 
 # Store parameters passed to this script
 KEYVAULT_NAME=${1}
+echo $KEYVAULT_NAME
 
 # install Azure CLI
 sudo apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y 
