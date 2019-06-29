@@ -41,9 +41,8 @@ sudo apt install jq -y
 
 # generate the private key
 chmod -R go-rwx $COCKROACHDB_CERTS_PATH
-touch $COCKROACHDB_CERTS_PATH/ca.key
-chmod go-rwx $COCKROACHDB_CERTS_PATH/ca.key
 cockroach cert create-ca --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key
+chmod go-rwx $COCKROACHDB_CERTS_PATH/ca.key
 
 # put the private key into keyvault
 az login --identity

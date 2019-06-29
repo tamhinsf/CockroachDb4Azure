@@ -17,6 +17,7 @@ echo $AZ_VMSS_ALL_INSTANCE_PRIVATE_IP
 COCKROACHDB_PATH=/cockroach-data
 COCKROACHDB_CERTS_PATH=$COCKROACHDB_PATH/certs
 chmod -R go-rwx $COCKROACHDB_CERTS_PATH
+rm $COCKROACHDB_CERTS_PATH/*
 
 az keyvault secret show --vault-name `cat $COCKROACHDB_CERTS_PATH/keyvault.name` -n crdbkey | jq -r .value > $COCKROACHDB_CERTS_PATH/ca.key
 
