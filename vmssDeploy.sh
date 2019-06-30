@@ -50,6 +50,5 @@ echo $KEYVAULT_NAME > $COCKROACHDB_CERTS_PATH/keyvault.name
 # install jq
 sudo apt install jq -y
 
-echo done  
 # Exit script with 0 code to tell Azure that the deployment is done
 exit 0 

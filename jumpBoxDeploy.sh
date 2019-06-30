@@ -47,6 +47,6 @@ az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbcrt -f $COCKROACHDB_CE
 # secure the folder contents
 chmod go-rwx $COCKROACHDB_CERTS_PATH/*
 
-echo done  
 # Exit script with 0 code to tell Azure that the deployment is done
 exit 0 
+

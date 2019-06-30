@@ -14,12 +14,14 @@ do
 done
 echo $AZ_VMSS_ALL_INSTANCE_PRIVATE_IP
 
+# clean up any existing local certs
 COCKROACHDB_PATH=/cockroach-data
 COCKROACHDB_CERTS_PATH=$COCKROACHDB_PATH/certs
 chmod -R go-rwx $COCKROACHDB_CERTS_PATH
 rm $COCKROACHDB_CERTS_PATH/*.key
 rm $COCKROACHDB_CERTS_PATH/*.crt
 
+# pull the current ca files from keyvault
 az keyvault secret show --vault-name `cat $COCKROACHDB_CERTS_PATH/keyvault.name` -n crdbkey | jq -r .value > $COCKROACHDB_CERTS_PATH/ca.key
 az keyvault secret show --vault-name `cat $COCKROACHDB_CERTS_PATH/keyvault.name` -n crdbcrt | jq -r .value > $COCKROACHDB_CERTS_PATH/ca.crt
 
@@ -41,5 +43,5 @@ chmod go-rwx $COCKROACHDB_CERTS_PATH/*
 # secure startup with certs
 cockroach start --certs-dir $COCKROACHDB_CERTS_PATH --advertise-addr=$AZ_VMSS_INSTANCE_PRIVATE_IP --join=$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP --store=$COCKROACHDB_PATH --background 
 
-echo done  # Exit script with 0 code to tell Azure that the deployment is done
+# Exit script with 0 code to tell Azure that the deployment is done
 exit 0 
