@@ -1,5 +1,6 @@
 # Store parameters passed to this script
 KEYVAULT_NAME=${1}
+LB_NAME=${2}
 
 # install Azure CLI
 sudo apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y 

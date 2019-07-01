@@ -41,12 +41,28 @@
         "description": "Size of each data disk(s)."
       }
     },
+    "vmssAnet" : {
+      "type": "bool",
+      "defaultValue": false,
+      "allowedValues": [
+        false,
+        true
+      ]
+    },
     "jumpBoxSku": {
       "type": "string",
       "defaultValue": "Standard_D2s_v3",
       "metadata": {
         "description": "Size of Jumpbox VM"
       }
+    },
+    "jumpBoxAnet" : {
+      "type": "bool",
+      "defaultValue": false,
+      "allowedValues": [
+        false,
+        true
+      ]
     },
     "adminUsername": {
       "type": "string",
@@ -79,8 +95,8 @@
   "variables": {
     "location": "[resourceGroup().location]",
     "tenantId": "[subscription().tenantId]",
-    "namingInfix": "[toLower(substring(concat(parameters('vmssName'), uniqueString(resourceGroup().id)), 0, 9))]",
-    "keyVaultName": "[concat(toLower(substring(concat(resourceGroup().name,uniqueString(resourceGroup().id)), 0, 9)),'-crdbkv')]",
+    "namingInfix": "[toLower(substring(concat(parameters('vmssName'), uniqueString(resourceGroup().id)), 0, 12))]",
+    "keyVaultName": "[concat(toLower(substring(concat(resourceGroup().name,uniqueString(resourceGroup().id)), 0, 12)),'-crdbkv')]",
     "userManagedIdentityName" : "[concat(variables('namingInfix'),'-userManagedIdentity')]",
     "userManagedIdentityRoleGuid" : "[guid(variables('namingInfix'))]",
     "jumpBoxName": "[concat(variables('namingInfix'), '-jbox')]",
@@ -195,7 +211,8 @@
               }
             }
           }
-        ]
+        ],
+        "enableAcceleratedNetworking":"[parameters('jumpBoxAnet')]"
       }
     },
     {
@@ -314,6 +331,7 @@
           "location": "[variables('location')]",
           "dependsOn": [
             "[variables('jumpBoxName')]",
+            "[variables('lbPublicIPName')]",
             "[variables('userManagedIdentityRoleGuid')]"
           ],
           "properties": {
@@ -327,7 +345,7 @@
               ]
             },
             "protectedSettings": {
-              "commandToExecute": "[concat('bash ', variables('jumpBoxScriptFileName'), ' ', variables('keyVaultName'))]"
+              "commandToExecute": "[concat('bash ', variables('jumpBoxScriptFileName'), ' ', variables('keyVaultName'), ' ', variables('lbPublicIPName'))]"
             }
           }
         }
@@ -490,7 +508,8 @@
                   ],
                   "networkSecurityGroup": {
                     "id": "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('nsgName'))]"
-                  }
+                  },
+                  "enableAcceleratedNetworking": "[parameters('vmssAnet')]"
                 }
               }
             ]
