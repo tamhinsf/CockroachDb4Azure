@@ -531,7 +531,7 @@
                     ]
                   },
                   "protectedSettings": {
-                    "commandToExecute": "[concat('bash ', variables('vmssScriptFileName'), ' ' , parameters('dataDiskNumber'), ' ',variables('keyVaultName'), ' ;', 'bash ', variables('vmssCrdbStartupScriptFileName'))]"
+                    "commandToExecute": "[concat('bash ', variables('vmssScriptFileName'), ' ' , parameters('dataDiskNumber'), ' ',variables('keyVaultName'), ' ', variables('lbPublicIPName'),' ;', 'bash ', variables('vmssCrdbStartupScriptFileName'))]"
                   }
                 }
               }

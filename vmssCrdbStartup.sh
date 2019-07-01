@@ -26,8 +26,8 @@ az keyvault secret show --vault-name `cat $COCKROACHDB_CERTS_PATH/keyvault.name`
 az keyvault secret show --vault-name `cat $COCKROACHDB_CERTS_PATH/keyvault.name` -n crdbcrt | jq -r .value > $COCKROACHDB_CERTS_PATH/ca.crt
 
 # resolve the current LB public hostname
-AZ_LB_PUBLIC_HOSTNAME=az network public-ip show --name `cat $COCKROACHDB_CERTS_PATH/lb.name` --group $AZ_RG_NAME --query dnsSettings.fqdn | tr -d '"'
-AZ_LB_PUBLIC_IP=az network public-ip show --name `cat $COCKROACHDB_CERTS_PATH/lb.name` --group $AZ_RG_NAME --query ipAddress | tr -d '"'
+AZ_LB_PUBLIC_HOSTNAME=az network public-ip show --name `cat $COCKROACHDB_CERTS_PATH/lb.name` --resource-group $AZ_RG_NAME --query dnsSettings.fqdn | tr -d '"'
+AZ_LB_PUBLIC_IP=az network public-ip show --name `cat $COCKROACHDB_CERTS_PATH/lb.name` --resource-group $AZ_RG_NAME --query ipAddress | tr -d '"'
 
 # create a certificate for the local machine
 cockroach cert create-node $AZ_VMSS_INSTANCE_PRIVATE_IP `hostname` $AZ_LB_PUBLIC_HOSTNAME $AZ_LB_PUBLIC_IP localhost 127.0.0.1 --certs-dir $COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key
