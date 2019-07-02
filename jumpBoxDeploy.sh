@@ -1,7 +1,3 @@
-# Store parameters passed to this script
-KEYVAULT_NAME=${1}
-LB_NAME=${2}
-
 # install Azure CLI
 sudo apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y 
 AZ_REPO=$(lsb_release -cs) 
@@ -12,6 +8,9 @@ sudo apt-key --keyring /etc/apt/trusted.gpg.d/Microsoft.gpg adv \
      --recv-keys BC528686B50D79E339D3721CEB3E94ADBE1229CF 
 sudo apt-get update 
 sudo apt-get install azure-cli 
+
+# login to Azure
+az login --identity
 
 # Set the variable COCKROACHDB_PATH to the default, re-use it in this script 
 COCKROACHDB_PATH=/cockroach-data
@@ -24,6 +23,9 @@ mkdir /var/lib/cockroach
 useradd cockroach
 chown cockroach /var/lib/cockroach
 chown -R cockroach:cockroach $COCKROACHDB_PATH
+
+# get the name of the keyvault
+KEYVAULT_NAME=`az resource list --tag crdb=crdb-keyvault --query [].name -o tsv`
 
 # prep for cockroach db certs
 COCKROACHDB_CERTS_PATH=$COCKROACHDB_PATH/certs
@@ -41,7 +43,6 @@ cockroach cert create-ca --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$COCKROACH
 cockroach cert create-client root --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key
 
 # put the private key into keyvault
-az login --identity
 az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbkey -f $COCKROACHDB_CERTS_PATH/ca.key
 az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbcrt -f $COCKROACHDB_CERTS_PATH/ca.crt
 

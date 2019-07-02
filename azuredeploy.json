@@ -2,6 +2,13 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "vmssName": {
+      "type": "string",
+      "metadata": {
+        "description": "String used as a base for naming resources (9 characters or less). A hash is prepended to this string for some resources, and resource-specific information is appended."
+      },
+      "maxLength": 61
+    },    
     "vmSku": {
       "type": "string",
       "defaultValue": "Standard_L4s",
@@ -9,12 +16,16 @@
         "description": "Size of VMs in the VM Scale Set."
       }
     },
-    "vmssName": {
-      "type": "string",
+    "vmssAnet" : {
+      "type": "bool",
+      "defaultValue": false,
+      "allowedValues": [
+        false,
+        true
+      ],
       "metadata": {
-        "description": "String used as a base for naming resources (9 characters or less). A hash is prepended to this string for some resources, and resource-specific information is appended."
-      },
-      "maxLength": 61
+        "description": "Does the VM SKU support Accelerated Networking?"
+      }
     },
     "instanceCount": {
       "type": "int",
@@ -41,14 +52,6 @@
         "description": "Size of each data disk(s)."
       }
     },
-    "vmssAnet" : {
-      "type": "bool",
-      "defaultValue": false,
-      "allowedValues": [
-        false,
-        true
-      ]
-    },
     "jumpBoxSku": {
       "type": "string",
       "defaultValue": "Standard_D2s_v3",
@@ -62,7 +65,10 @@
       "allowedValues": [
         false,
         true
-      ]
+      ],
+      "metadata": {
+        "description": "Does the VM SKU support Accelerated Networking?"
+      }
     },
     "adminUsername": {
       "type": "string",
@@ -96,9 +102,13 @@
     "location": "[resourceGroup().location]",
     "tenantId": "[subscription().tenantId]",
     "namingInfix": "[toLower(substring(concat(parameters('vmssName'), uniqueString(resourceGroup().id)), 0, 12))]",
+    "crdbTagKey" : "crdb",
+    "crdbTagValuePrefix" : "crdb-",
+    "keyVaultTag" : "[concat(variables('crdbTagValuePrefix'),'keyvault')]",
     "keyVaultName": "[concat(toLower(substring(concat(resourceGroup().name,uniqueString(resourceGroup().id)), 0, 12)),'-crdbkv')]",
     "userManagedIdentityName" : "[concat(variables('namingInfix'),'-userManagedIdentity')]",
     "userManagedIdentityRoleGuid" : "[guid(variables('namingInfix'))]",
+    "jumpBoxTag" : "[concat(variables('crdbTagValuePrefix'),'jumpbox')]",
     "jumpBoxName": "[concat(variables('namingInfix'), '-jbox')]",
     "jumpBoxOSDiskName": "[concat(variables('jumpBoxName'), '-osdisk')]",
     "jumpBoxIPConfigName": "[concat(variables('jumpBoxName'), '-ipconfig')]",
@@ -111,13 +121,16 @@
     "subnetName": "[concat(variables('namingInfix'), '-subnet')]",
     "subnetPrefix": "10.3.0.0/24",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
-    "nsgName" : "[concat(resourceGroup().name,'-nsg')]",
+    "nsgName" : "[concat(variables('namingInfix'),'-nsg')]",
+    "lbTag" : "[concat(variables('crdbTagValuePrefix'),'lb')]",
     "lbName": "[concat(variables('namingInfix'), '-lb')]",
     "lbID": "[resourceId('Microsoft.Network/loadBalancers',variables('lbName'))]",
     "lbPublicIPName": "[concat(variables('lbName'), '-pip')]",
     "lbPublicHostName" : "[concat(variables('namingInfix'), '-crdbgw')]",
     "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/loadBalancerFrontEnd')]",
     "bePoolName": "[concat(variables('namingInfix'), '-bepool')]",
+    "vmssTag" : "[concat(variables('crdbTagValuePrefix'),'vmss')]",
+    "vmssName" : "[concat(variables('namingInfix'),'-vmss')]",
     "vmssNicName": "[concat(variables('namingInfix'), '-nic')]",
     "vmssIpConfigName": "[concat(variables('namingInfix'), '-ipconfig')]",
     "vmssScriptFileName": "vmssDeploy.sh",
@@ -137,6 +150,9 @@
       "type": "Microsoft.KeyVault/vaults",
       "name": "[variables('keyVaultName')]",
       "location": "[variables('location')]",
+      "tags": {
+        "[variables('crdbTagKey')]" : "[variables('keyVaultTag')]"
+      },
       "dependsOn": [
         "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/',variables('userManagedIdentityName'))]"
       ],
@@ -287,6 +303,9 @@
         "[concat('Microsoft.Network/networkInterfaces/', variables('jumpBoxNicName'))]",
         "[variables('userManagedIdentityName')]"
       ],
+      "tags": {
+        "[variables('crdbTagKey')]" : "[variables('jumpBoxTag')]"
+      },
       "identity" :{
         "type": "UserAssigned",
         "userAssignedIdentities":{
@@ -356,6 +375,9 @@
       "name": "[variables('lbName')]",
       "location": "[variables('location')]",
       "apiVersion": "2018-08-01",
+      "tags": {
+        "[variables('crdbTagKey')]" : "[variables('lbTag')]"
+      },
       "sku": {
         "name": "Basic"
       },
@@ -391,7 +413,7 @@
               "idleTimeoutInMinutes": 4,
               "protocol": "Tcp",
               "enableTcpReset": false,
-              "loadDistribution": "Default",
+              "loadDistribution": "SourceIPProtocol",
               "backendAddressPool": {
                 "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('lbName'), '/backendAddressPools/', variables('bePoolName'))]"
               },
@@ -429,8 +451,8 @@
               "protocol": "Http",
               "port": 8080,
               "requestPath": "/health?ready=1",
-              "intervalInSeconds": 10,
-              "numberOfProbes": 100000
+              "intervalInSeconds": 15,
+              "numberOfProbes": 4
             }
           }
         ]
@@ -438,9 +460,12 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachineScaleSets",
-      "name": "[variables('namingInfix')]",
+      "name": "[variables('vmssName')]",
       "location": "[variables('location')]",
       "apiVersion": "2018-06-01",
+      "tags": {
+        "[variables('crdbTagKey')]" : "[variables('vmssTag')]"
+      },
       "dependsOn": [
         "[concat('Microsoft.Network/loadBalancers/', variables('lbName'))]",
         "[concat('Microsoft.Network/networkSecurityGroups/',variables('nsgName'))]",

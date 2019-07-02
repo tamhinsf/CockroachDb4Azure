@@ -1,7 +1,5 @@
 # Store parameters passed to this script
 NUM_OF_DATA_DISKS=${1}
-KEYVAULT_NAME=${2}
-LB_NAME=${3}
 
 # install Azure CLI
 sudo apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y 
@@ -46,9 +44,6 @@ chown -R cockroach:cockroach $COCKROACHDB_PATH
 COCKROACHDB_CERTS_PATH=$COCKROACHDB_PATH/certs
 mkdir $COCKROACHDB_CERTS_PATH
 chmod -R go-rwx $COCKROACHDB_CERTS_PATH
-echo $KEYVAULT_NAME > $COCKROACHDB_CERTS_PATH/keyvault.name
-echo $LB_NAME > $COCKROACHDB_CERTS_PATH/lb.name
-
 
 # install jq
 sudo apt install jq -y
