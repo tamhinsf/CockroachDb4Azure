@@ -21,7 +21,7 @@ chmod -R go-rwx $COCKROACHDB_CERTS_PATH
 rm $COCKROACHDB_CERTS_PATH/*.key
 rm $COCKROACHDB_CERTS_PATH/*.crt
 
-# get the name of the keyvault and load balancer
+# get the resource name of the keyvault and load balancer using tags
 KEYVAULT_NAME=`az resource list --tag crdb=crdb-keyvault --query [].name -o tsv`
 LB_NAME=`az resource list --tag crdb=crdb-lb --query [].name -o tsv`
 

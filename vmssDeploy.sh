@@ -16,16 +16,23 @@ sudo apt-get install azure-cli
 COCKROACHDB_PATH=/cockroach-data
 mkdir $COCKROACHDB_PATH 
 
-if [ $NUM_OF_DATA_DISKS -eq 1 ]; then
+# if [ $NUM_OF_DATA_DISKS -eq 1 ]; then
+#   mkfs -F -t ext4 /dev/sdc 
+#   echo "UUID=`blkid -s UUID /dev/sdc | cut -d '"' -f2` $COCKROACHDB_PATH ext4  defaults,discard 0 0" | tee -a /etc/fstab 
+# else
+apt-get install lsscsi -y 
+DEVICE_LIST=`lsscsi |grep -v "/dev/sda \|/dev/sdb \|/dev/sr0 " | cut -d "/" -f3`
+DEVICE_COUNT=`echo $DEVICE_LIST | wc -l `
+DEVICE_NAME_STRING=
+if [ $DEVICE_COUNT -eq 1 ]; then
   mkfs -F -t ext4 /dev/sdc 
   echo "UUID=`blkid -s UUID /dev/sdc | cut -d '"' -f2` $COCKROACHDB_PATH ext4  defaults,discard 0 0" | tee -a /etc/fstab 
 else
-  apt-get install lsscsi -y 
-  DEVICE_NAME_STRING=
-  for device in `lsscsi |grep -v "/dev/sda \|/dev/sdb \|/dev/sr0 " | cut -d "/" -f3`; do 
+#for device in `lsscsi |grep -v "/dev/sda \|/dev/sdb \|/dev/sr0 " | cut -d "/" -f3`; do 
+for device in $DEVICE_LIST; do
    DEVICE_NAME_STRING_TMP=`echo /dev/$device`
    DEVICE_NAME_STRING=`echo $DEVICE_NAME_STRING $DEVICE_NAME_STRING_TMP`
-  done
+done
   mdadm --create /dev/md0 --level 0 --raid-devices=$NUM_OF_DATA_DISKS $DEVICE_NAME_STRING 
   mkfs -F -t ext4 /dev/md0 
   echo "UUID=`blkid -s UUID /dev/md0 | cut -d '"' -f2` $COCKROACHDB_PATH ext4  defaults,discard 0 0" | tee -a /etc/fstab 

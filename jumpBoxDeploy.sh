@@ -24,7 +24,7 @@ useradd cockroach
 chown cockroach /var/lib/cockroach
 chown -R cockroach:cockroach $COCKROACHDB_PATH
 
-# get the name of the keyvault
+# get the resource name of the keyvault using tags
 KEYVAULT_NAME=`az resource list --tag crdb=crdb-keyvault --query [].name -o tsv`
 
 # prep for cockroach db certs
