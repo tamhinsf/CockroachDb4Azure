@@ -555,7 +555,7 @@
                     ]
                   },
                   "protectedSettings": {
-                    "commandToExecute": "[concat('bash ', variables('vmssScriptFileName'), ' ' , parameters('dataDiskNumber'),' ;', 'bash ', variables('vmssCrdbStartupScriptFileName'))]"
+                    "commandToExecute": "[concat('bash ', variables('vmssScriptFileName'),' ;', 'bash ', variables('vmssCrdbStartupScriptFileName'))]"
                   }
                 }
               }

@@ -1,6 +1,3 @@
-# Store parameters passed to this script
-NUM_OF_DATA_DISKS=${1}
-
 # install Azure CLI
 sudo apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y 
 AZ_REPO=$(lsb_release -cs) 
@@ -16,10 +13,7 @@ sudo apt-get install azure-cli
 COCKROACHDB_PATH=/cockroach-data
 mkdir $COCKROACHDB_PATH 
 
-# if [ $NUM_OF_DATA_DISKS -eq 1 ]; then
-#   mkfs -F -t ext4 /dev/sdc 
-#   echo "UUID=`blkid -s UUID /dev/sdc | cut -d '"' -f2` $COCKROACHDB_PATH ext4  defaults,discard 0 0" | tee -a /etc/fstab 
-# else
+# Discover number of data disks and format as a RAID 0 if greater than 1
 apt-get install lsscsi -y 
 DEVICE_LIST=`lsscsi |grep -v "/dev/sda \|/dev/sdb \|/dev/sr0 " | cut -d "/" -f3`
 DEVICE_COUNT=`echo $DEVICE_LIST | wc -l `
@@ -28,7 +22,6 @@ if [ $DEVICE_COUNT -eq 1 ]; then
   mkfs -F -t ext4 /dev/sdc 
   echo "UUID=`blkid -s UUID /dev/sdc | cut -d '"' -f2` $COCKROACHDB_PATH ext4  defaults,discard 0 0" | tee -a /etc/fstab 
 else
-#for device in `lsscsi |grep -v "/dev/sda \|/dev/sdb \|/dev/sr0 " | cut -d "/" -f3`; do 
 for device in $DEVICE_LIST; do
    DEVICE_NAME_STRING_TMP=`echo /dev/$device`
    DEVICE_NAME_STRING=`echo $DEVICE_NAME_STRING $DEVICE_NAME_STRING_TMP`
