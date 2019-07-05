@@ -21,8 +21,7 @@ wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.2.linux-amd64.tgz | t
 cp -i cockroach-v19.1.2.linux-amd64/cockroach /usr/local/bin
 useradd -m -d /home/cockroach -s /bin/bash cockroach
 mkdir /var/lib/cockroach
-chown cockroach /var/lib/cockroach
-chown -R cockroach:cockroach $COCKROACHDB_PATH
+chown -R cockroach:cockroach /var/lib/cockroach
 
 # get the resource name of the keyvault using tags
 KEYVAULT_NAME=`az resource list --tag crdb=crdb-keyvault --query [].name -o tsv`
@@ -31,6 +30,7 @@ KEYVAULT_NAME=`az resource list --tag crdb=crdb-keyvault --query [].name -o tsv`
 COCKROACHDB_CERTS_PATH=$COCKROACHDB_PATH/certs
 mkdir $COCKROACHDB_CERTS_PATH
 chmod -R go-rwx $COCKROACHDB_CERTS_PATH
+chown -R cockroach:cockroach $COCKROACHDB_PATH
 
 # install jq
 sudo apt install jq -y
