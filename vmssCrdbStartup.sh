@@ -12,7 +12,6 @@ for PRIVATE_IP in $(az vmss nic list --resource-group $AZ_RG_NAME --vmss-name $A
 do
   AZ_VMSS_ALL_INSTANCE_PRIVATE_IP=$PRIVATE_IP,$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP
 done
-echo $AZ_VMSS_ALL_INSTANCE_PRIVATE_IP
 
 # clean up any existing local certs
 COCKROACHDB_PATH=/cockroach-data
