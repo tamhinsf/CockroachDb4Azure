@@ -36,7 +36,7 @@ mount $COCKROACHDB_PATH
 # install coackroach db
 wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.2.linux-amd64.tgz | tar  xvz
 cp -i cockroach-v19.1.2.linux-amd64/cockroach /usr/local/bin
-useradd cockroach
+useradd -m -d /home/cockroach -s /bin/bash cockroach
 mkdir /var/lib/cockroach
 chown cockroach /var/lib/cockroach
 chown -R cockroach:cockroach $COCKROACHDB_PATH
