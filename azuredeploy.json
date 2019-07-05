@@ -122,9 +122,9 @@
     "subnetPrefix": "10.3.0.0/24",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
     "nsgName" : "[concat(variables('namingInfix'),'-nsg')]",
-    "lbTag" : "[concat(variables('crdbTagValuePrefix'),'lb')]",
     "lbName": "[concat(variables('namingInfix'), '-lb')]",
     "lbID": "[resourceId('Microsoft.Network/loadBalancers',variables('lbName'))]",
+    "lbPublicIpTag" : "[concat(variables('crdbTagValuePrefix'),'lb-pip')]",
     "lbPublicIPName": "[concat(variables('lbName'), '-pip')]",
     "lbPublicHostName" : "[concat(variables('namingInfix'), '-crdbgw')]",
     "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/loadBalancerFrontEnd')]",
@@ -284,6 +284,9 @@
       "name": "[variables('lbPublicIPName')]",
       "location": "[variables('location')]",
       "apiVersion": "2018-10-01",
+      "tags": {
+        "[variables('crdbTagKey')]" : "[variables('lbPublicIpTag')]"
+      },
       "sku": {
         "name": "Basic"
       },
@@ -374,9 +377,6 @@
       "name": "[variables('lbName')]",
       "location": "[variables('location')]",
       "apiVersion": "2018-08-01",
-      "tags": {
-        "[variables('crdbTagKey')]" : "[variables('lbTag')]"
-      },
       "sku": {
         "name": "Basic"
       },

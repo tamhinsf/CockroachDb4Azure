@@ -23,11 +23,11 @@ rm $COCKROACHDB_CERTS_PATH/*.crt
 
 # get the resource name of the keyvault and load balancer using tags
 KEYVAULT_NAME=`az resource list --tag crdb=crdb-keyvault --query [].name -o tsv`
-LB_NAME=`az resource list --tag crdb=crdb-lb --query [].name -o tsv`
+LB_PIP_NAME=`az resource list --tag crdb=crdb-lb-pip --query [].name -o tsv`
 
 # resolve the current LB public hostname and ip address
-AZ_LB_PUBLIC_HOSTNAME=`az network public-ip show --name $LB_NAME --resource-group $AZ_RG_NAME --query dnsSettings.fqdn | tr -d '"'`
-AZ_LB_PUBLIC_IP=`az network public-ip show --name $LB_NAME --resource-group $AZ_RG_NAME --query ipAddress | tr -d '"'`
+AZ_LB_PUBLIC_HOSTNAME=`az network public-ip show --name $LB_PIP_NAME --resource-group $AZ_RG_NAME --query dnsSettings.fqdn | tr -d '"'`
+AZ_LB_PUBLIC_IP=`az network public-ip show --name $LB_PIP_NAME --resource-group $AZ_RG_NAME --query ipAddress | tr -d '"'`
 
 # pull the current ca files from keyvault
 az keyvault secret show --vault-name $KEYVAULT_NAME -n crdbkey | jq -r .value > $COCKROACHDB_CERTS_PATH/ca.key
