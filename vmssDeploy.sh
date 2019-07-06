@@ -9,9 +9,15 @@ sudo apt-key --keyring /etc/apt/trusted.gpg.d/Microsoft.gpg adv \
 sudo apt-get update 
 sudo apt-get install azure-cli 
 
+# Create a cockroach user
+COCKROACH_USER=cockroach
+COCKROACH_USER_HOME=/home/cockroach
+useradd -m -d $COCKROACH_USER_HOME -s /bin/bash $COCKROACH_USER
+
 # Set the variable COCKROACHDB_PATH to the default, re-use it in this script 
 COCKROACHDB_PATH=/cockroach-data
 mkdir $COCKROACHDB_PATH 
+chown -R $COCKROACH_USER:$COCKROACH_USER $COCKROACHDB_PATH
 
 # Discover number of data disks and format as a RAID 0 if greater than 1
 apt-get install lsscsi -y 
@@ -36,15 +42,13 @@ mount $COCKROACHDB_PATH
 # install coackroach db
 wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.2.linux-amd64.tgz | tar  xvz
 cp -i cockroach-v19.1.2.linux-amd64/cockroach /usr/local/bin
-useradd -m -d /home/cockroach -s /bin/bash cockroach
 mkdir /var/lib/cockroach
-chown -R cockroach:cockroach /var/lib/cockroach
+chown -R $COCKROACH_USER:$COCKROACH_USER /var/lib/cockroach
 
 # prep for cockroach db certs
-COCKROACHDB_CERTS_PATH=$COCKROACHDB_PATH/certs
+COCKROACHDB_CERTS_PATH=$COCKROACH_USER_HOME/certs
 mkdir $COCKROACHDB_CERTS_PATH
-chmod -R go-rwx $COCKROACHDB_CERTS_PATH
-chown -R cockroach:cockroach $COCKROACHDB_PATH
+chown -R cockroach $COCKROACHDB_CERTS_PATH
 
 # install jq
 sudo apt install jq -y
