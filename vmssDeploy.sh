@@ -61,7 +61,7 @@ chown -R $COCKROACH_USER:$COCKROACH_USER $COCKROACH_USER_HOME
 chmod -R o-rwx $COCKROACH_USER_HOME
 chmod -R g+s $COCKROACH_USER_HOME
 
-systemctl cockroachdb start
+systemctl start cockroachdb
 
 # Exit script with 0 code to tell Azure that the deployment is done
 exit 0 

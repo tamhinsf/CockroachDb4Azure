@@ -4,7 +4,7 @@ Requires=network.target
 [Service]
 Type=notify
 WorkingDirectory=/var/lib/cockroach
-ExecStart=/home/cockroach/vmssCrdbStartup.sh
+ExecStart=/bin/bash /home/cockroach/vmssCrdbStartup.sh
 TimeoutStopSec=60
 Restart=always
 RestartSec=10
