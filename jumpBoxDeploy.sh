@@ -50,6 +50,10 @@ cockroach cert create-client root --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$
 az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbkey -f $COCKROACHDB_CERTS_PATH/ca.key
 az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbcrt -f $COCKROACHDB_CERTS_PATH/ca.crt
 
+# clean up permissions
+chmod -R o-rwx $COCKROACH_USER_HOME
+chmod -R g+s $COCKROACH_USER_HOME
+
 # Exit script with 0 code to tell Azure that the deployment is done
 exit 0 
 

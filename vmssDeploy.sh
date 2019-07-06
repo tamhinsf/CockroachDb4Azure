@@ -13,13 +13,10 @@ sudo apt-get install azure-cli
 COCKROACH_USER=cockroach
 COCKROACH_USER_HOME=/home/cockroach
 useradd -m -d $COCKROACH_USER_HOME -s /bin/bash $COCKROACH_USER
-chmod -R o-rwx $COCKROACH_USER_HOME
-chmod -R g+s $COCKROACH_USER_HOME
 
 # Set the variable COCKROACHDB_PATH to the default, re-use it in this script 
 COCKROACHDB_PATH=/cockroach-data
 mkdir $COCKROACHDB_PATH 
-chown -R $COCKROACH_USER:$COCKROACH_USER $COCKROACHDB_PATH
 
 # Discover number of data disks and format as a RAID 0 if greater than 1
 apt-get install lsscsi -y 
@@ -40,6 +37,7 @@ done
 fi
 
 mount $COCKROACHDB_PATH
+chown -R $COCKROACH_USER:$COCKROACH_USER $COCKROACHDB_PATH
 
 # install coackroach db
 wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.2.linux-amd64.tgz | tar  xvz
@@ -53,6 +51,14 @@ mkdir $COCKROACHDB_CERTS_PATH
 
 # install jq
 sudo apt install jq -y
+
+# put startup script in home directory
+cp vmssCrdbStartup.sh $COCKROACH_USER_HOME
+chmod u+rx $COCKROACH_USER_HOME/vmssCrdbStartup.sh
+
+# clean up permissions
+chmod -R o-rwx $COCKROACH_USER_HOME
+chmod -R g+s $COCKROACH_USER_HOME
 
 # Exit script with 0 code to tell Azure that the deployment is done
 exit 0 
