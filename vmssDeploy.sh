@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # install Azure CLI
 sudo apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y 
 AZ_REPO=$(lsb_release -cs) 
