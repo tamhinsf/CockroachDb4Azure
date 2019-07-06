@@ -555,7 +555,7 @@
                     ]
                   },
                   "protectedSettings": {
-                    "commandToExecute": "[concat('bash ', variables('vmssScriptFileName'),' ;', 'cp ', variables('vmssCrdbStartupScriptFileName'), ' /home/cockroach')]"
+                    "commandToExecute": "[concat('bash ', variables('vmssScriptFileName'),' ;', 'cp ', variables('vmssCrdbStartupScriptFileName'), ' /home/cockroach', ' ;', ' chmod +x /home/cockroach/', variables('vmssCrdbStartupScriptFileName'))]"
                   }
                 }
               }
