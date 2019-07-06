@@ -16,13 +16,11 @@ az login --identity
 COCKROACH_USER=cockroach
 COCKROACH_USER_HOME=/home/cockroach
 useradd -m -d $COCKROACH_USER_HOME -s /bin/bash $COCKROACH_USER
-chmod -R o-rwx $COCKROACH_USER_HOME
-chmod -R g+s $COCKROACH_USER_HOME
 
 # Set the variable COCKROACHDB_PATH to the default, re-use it in this script 
 COCKROACHDB_PATH=/cockroach-data
 mkdir $COCKROACHDB_PATH 
-chown -R $COCKROACH_USER $COCKROACHDB_PATH
+chown -R $COCKROACH_USER:$COCKROACH_USER $COCKROACHDB_PATH
 
 # install coackroach db
 wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.2.linux-amd64.tgz | tar  xvz
@@ -51,6 +49,7 @@ az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbkey -f $COCKROACHDB_CE
 az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbcrt -f $COCKROACHDB_CERTS_PATH/ca.crt
 
 # clean up permissions
+chown -R $COCKROACH_USER:$COCKROACH_USER $COCKROACH_USER_HOME
 chmod -R o-rwx $COCKROACH_USER_HOME
 chmod -R g+s $COCKROACH_USER_HOME
 

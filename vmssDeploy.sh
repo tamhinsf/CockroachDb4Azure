@@ -45,10 +45,6 @@ cp -i cockroach-v19.1.2.linux-amd64/cockroach /usr/local/bin
 mkdir /var/lib/cockroach
 chown -R $COCKROACH_USER:$COCKROACH_USER /var/lib/cockroach
 
-# prep for cockroach db certs
-COCKROACHDB_CERTS_PATH=$COCKROACH_USER_HOME/certs
-mkdir $COCKROACHDB_CERTS_PATH
-
 # install jq
 sudo apt install jq -y
 
@@ -57,6 +53,7 @@ cp vmssCrdbStartup.sh $COCKROACH_USER_HOME
 chmod u+rx $COCKROACH_USER_HOME/vmssCrdbStartup.sh
 
 # clean up permissions
+chown -R $COCKROACH_USER:$COCKROACH_USER $COCKROACH_USER_HOME
 chmod -R o-rwx $COCKROACH_USER_HOME
 chmod -R g+s $COCKROACH_USER_HOME
 
