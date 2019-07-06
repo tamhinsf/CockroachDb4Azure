@@ -16,6 +16,8 @@ az login --identity
 COCKROACH_USER=cockroach
 COCKROACH_USER_HOME=/home/cockroach
 useradd -m -d $COCKROACH_USER_HOME -s /bin/bash $COCKROACH_USER
+chmod -R o-rwx $COCKROACH_USER_HOME
+chmod -R g+s $COCKROACH_USER_HOME
 
 # Set the variable COCKROACHDB_PATH to the default, re-use it in this script 
 COCKROACHDB_PATH=/cockroach-data
@@ -34,7 +36,6 @@ KEYVAULT_NAME=`az resource list --tag crdb=crdb-keyvault --query [].name -o tsv`
 # prep for cockroach db certs
 COCKROACHDB_CERTS_PATH=$COCKROACH_USER_HOME/certs
 mkdir $COCKROACHDB_CERTS_PATH
-chown -R cockroach $COCKROACHDB_CERTS_PATH
 
 # install jq
 sudo apt install jq -y

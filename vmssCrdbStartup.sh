@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # get information about the current vmss node
 AZ_VMSS_NAME=`curl -H Metadata:true "http://169.254.169.254/metadata/instance/compute/vmScaleSetName?api-version=2018-10-01&format=text"`
 AZ_RG_NAME=`curl -H Metadata:true "http://169.254.169.254/metadata/instance/compute/resourceGroupName?api-version=2018-10-01&format=text"`
@@ -17,7 +19,6 @@ done
 COCKROACHDB_PATH=/cockroach-data
 COCKROACH_USER_HOME=/home/`whoami`
 COCKROACHDB_CERTS_PATH=$COCKROACH_USER_HOME/certs
-chmod -R go-rwx $COCKROACHDB_CERTS_PATH
 rm $COCKROACHDB_CERTS_PATH/*.key
 rm $COCKROACHDB_CERTS_PATH/*.crt
 
