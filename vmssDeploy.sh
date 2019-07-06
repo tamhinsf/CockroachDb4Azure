@@ -52,10 +52,16 @@ sudo apt install jq -y
 cp vmssCrdbStartup.sh $COCKROACH_USER_HOME
 chmod u+rx $COCKROACH_USER_HOME/vmssCrdbStartup.sh
 
+# put system service into startup directory
+cp cockroachdb.service /etc/systemd/system
+chmod g+r /etc/systemd/system/cockroachdb.service 
+
 # clean up permissions
 chown -R $COCKROACH_USER:$COCKROACH_USER $COCKROACH_USER_HOME
 chmod -R o-rwx $COCKROACH_USER_HOME
 chmod -R g+s $COCKROACH_USER_HOME
+
+systemctl cockroachdb start
 
 # Exit script with 0 code to tell Azure that the deployment is done
 exit 0 

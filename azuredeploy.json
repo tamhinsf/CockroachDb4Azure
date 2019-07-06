@@ -137,6 +137,8 @@
     "vmssScriptUrl" : "[concat(parameters('_artifactsLocation'), variables('vmssScriptFileName'), parameters('_artifactsLocationSasToken'))]",
     "vmssCrdbStartupScriptFileName": "vmssCrdbStartup.sh",
     "vmssCrdbStartupScriptUrl" : "[concat(parameters('_artifactsLocation'), variables('vmssCrdbStartupScriptFileName'), parameters('_artifactsLocationSasToken'))]",   
+    "vmssCrdbStartupServiceFileName": "cockroachdb.service",
+    "vmssCrdbStartupServiceUrl" : "[concat(parameters('_artifactsLocation'), variables('vmssCrdbStartupServiceFileName'), parameters('_artifactsLocationSasToken'))]",   
     "imageReference": "[variables('osType')]",
     "osType": {
       "publisher": "Canonical",
@@ -551,7 +553,8 @@
                   "settings": {
                     "fileUris": [
                       "[variables('vmssScriptUrl')]",
-                      "[variables('vmssCrdbStartupScriptUrl')]"
+                      "[variables('vmssCrdbStartupScriptUrl')]",
+                      "[variables('vmssCrdbStartupServiceUrl')]"
                     ]
                   },
                   "protectedSettings": {

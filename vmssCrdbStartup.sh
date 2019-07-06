@@ -53,5 +53,3 @@ chmod go-rwx $COCKROACHDB_CERTS_PATH/*
 # secure startup with certs
 cockroach start --certs-dir $COCKROACHDB_CERTS_PATH --advertise-addr=$AZ_VMSS_INSTANCE_PRIVATE_IP --join=$AZ_VMSS_ALL_INSTANCE_PRIVATE_IP --store=$COCKROACHDB_PATH --background 
 
-# Exit script with 0 code to tell Azure that the deployment is done
-exit 0 

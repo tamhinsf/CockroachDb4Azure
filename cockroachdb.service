@@ -1,0 +1,16 @@
+[Unit]
+Description=Cockroach Database cluster node
+Requires=network.target
+[Service]
+Type=notify
+WorkingDirectory=/var/lib/cockroach
+ExecStart=/home/cockroach/vmssCrdbStartup.sh
+TimeoutStopSec=60
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=cockroach
+User=cockroach
+[Install]
+WantedBy=default.target
