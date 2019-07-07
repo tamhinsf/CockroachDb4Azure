@@ -64,6 +64,7 @@ chmod -R o-rwx $COCKROACH_USER_HOME
 chmod -R g+s $COCKROACH_USER_HOME
 
 systemctl start cockroachdb
+systemctl enable cockroachdb
 
 # Exit script with 0 code to tell Azure that the deployment is done
 exit 0 
