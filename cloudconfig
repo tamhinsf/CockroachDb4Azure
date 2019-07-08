@@ -11,17 +11,19 @@ users:
 - name: cockroach
   shell: /bin/bash
 runcmd:
-- [ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash ]
-- [ wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.2.linux-amd64.tgz | tar  xvz ]
-- [ rehash ]
-- [ cp -i cockroach-v19.1.2.linux-amd64/cockroach /usr/local/bin ]
-- [ chown -R cockroach:cockroach /var/lib/cockroach ]
-- [ COCKROACHDB_CERTS_PATH = /home/cockroach/certs ]
-- [ KEYVAULT_NAME=`/usr/bin/az resource list --tag crdb=crdb-keyvault --query [].name -o tsv` ]
-- [ cockroach cert create-ca --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key ]
-- [ cockroach cert create-client root --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key ]
-- [ /usr/bin/az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbkey -f $COCKROACHDB_CERTS_PATH/ca.key ]
-- [ /usr/bin/az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbcrt -f $COCKROACHDB_CERTS_PATH/ca.crt ]
-- [ chown -R cockroach:cockroach /home/cockroach ]
-- [ chmod -R o-rwx /home/cockroach ]
-- [ chmod -R g+s /home/cockroach ]
+- curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash 
+- wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.2.linux-amd64.tgz | tar  xvz
+- cp -i cockroach-v19.1.2.linux-amd64/cockroach /usr/local/bin 
+- mkdir /var/lib/cockroach
+- chown -R cockroach:cockroach /var/lib/cockroach 
+- COCKROACH_USER_HOME=/home/cockroach
+- COCKROACHDB_CERTS_PATH=$COCKROACH_USER_HOME/certs 
+- az login --identity
+- KEYVAULT_NAME=`/usr/bin/az resource list --tag crdb=crdb-keyvault --query [].name -o tsv` 
+- cockroach cert create-ca --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key 
+- cockroach cert create-client root --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key 
+- /usr/bin/az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbkey -f $COCKROACHDB_CERTS_PATH/ca.key 
+- /usr/bin/az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbcrt -f $COCKROACHDB_CERTS_PATH/ca.crt 
+- chown -R cockroach:cockroach /home/cockroach 
+- chmod -R o-rwx /home/cockroach 
+- chmod -R g+s /home/cockroach 
