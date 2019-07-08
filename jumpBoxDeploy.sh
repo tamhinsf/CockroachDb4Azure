@@ -56,3 +56,12 @@
 # # Exit script with 0 code to tell Azure that the deployment is done
 # exit 0 
 
+az login --identity
+COCKROACH_USER=cockroach
+COCKROACH_USER_HOME=/home/cockroach
+COCKROACHDB_PATH=/cockroach-data
+COCKROACHDB_CERTS_PATH=$COCKROACH_USER_HOME/certs
+AZ_LB_PUBLIC_HOSTNAME=`az network public-ip show --name $LB_PIP_NAME --resource-group $AZ_RG_NAME --query dnsSettings.fqdn | tr -d '"'`
+AZ_LB_PUBLIC_IP=`az network public-ip show --name $LB_PIP_NAME --resource-group $AZ_RG_NAME --query ipAddress | tr -d '"'`
+cockroach init --certs-dir=$COCKROACHDB_CERTS_PATH --host==$AZ_LB_PUBLIC_HOSTNAME
+cockroach sql  --certs=dir=$COCKROACHDB_CERTS_PATH --host==$AZ_LB_PUBLIC_HOSTNAME --execute="CREATE USER goatse WITH PASSWORD 'goatse'"
