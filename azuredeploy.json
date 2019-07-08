@@ -485,7 +485,7 @@
       "dependsOn": [
         "[concat('Microsoft.Network/loadBalancers/', variables('lbName'))]",
         "[concat('Microsoft.Network/networkSecurityGroups/',variables('nsgName'))]",
-        "jumpBoxScript"
+        "[variables('jumpBoxName')]"
       ],
       "identity": {
         "type": "UserAssigned",
