@@ -1,0 +1,38 @@
+#cloud-config
+package_upgrade: true
+packages:
+- apt-transport-https 
+- lsb-release 
+- software-properties-common 
+- dirmngr
+- jq
+groups:
+- cockroach
+users:
+- default
+- name: cockroach
+  groups: cockroach
+  shell: /bin/bash
+  home: /home/cockroach
+write_files:
+- owner: cockroach:cockroach
+  path: /home/cockroach
+- owner: cockroach:cockroach
+  path: /home/cockroach/certs
+- owner: cockroach:cockroach
+  path: /var/lib/cockroach
+- owner: cockroach:cockroach
+  path: /cockroach-data
+runcmd:
+- AZ_REPO=$(lsb_release -cs) 
+- echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | sudo tee /etc/apt/sources.list.d/azure-cli.list 
+- apt-key --keyring /etc/apt/trusted.gpg.d/Microsoft.gpg adv --keyserver packages.microsoft.com --recv-keys BC528686B50D79E339D3721CEB3E94ADBE1229CF 
+- apt-get install azure-cli 
+- wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.2.linux-amd64.tgz | tar  xvz
+- cp -i cockroach-v19.1.2.linux-amd64/cockroach /usr/local/bin
+- COCKROACHDB_CERTS_PATH = /home/cockroach/certs
+- KEYVAULT_NAME=`az resource list --tag crdb=crdb-keyvault --query [].name -o tsv`
+- cockroach cert create-ca --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key
+- cockroach cert create-client root --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key
+- az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbkey -f $COCKROACHDB_CERTS_PATH/ca.key
+- az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbcrt -f $COCKROACHDB_CERTS_PATH/ca.crt
