@@ -305,7 +305,7 @@
         "name": "Standard"
       },
       "properties": {
-        "publicIPAllocationMethod": "Standard",
+        "publicIPAllocationMethod": "Static",
         "dnsSettings": {
           "domainNameLabel": "[variables('lbPublicHostName')]"
         }

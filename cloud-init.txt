@@ -1,10 +1,6 @@
 #cloud-config
 package_upgrade: true
 packages:
-- apt-transport-https 
-- lsb-release 
-- software-properties-common 
-- dirmngr
 - jq
 users:
 - default
@@ -17,9 +13,9 @@ runcmd:
 - mkdir /var/lib/cockroach
 - chown -R cockroach:cockroach /var/lib/cockroach 
 - COCKROACH_USER_HOME=/home/cockroach
-- COCKROACHDB_CERTS_PATH=$COCKROACH_USER_HOME/certs 
 - az login --identity
 - KEYVAULT_NAME=`/usr/bin/az resource list --tag crdb=crdb-keyvault --query [].name -o tsv` 
+- COCKROACHDB_CERTS_PATH=$COCKROACH_USER_HOME/certs 
 - cockroach cert create-ca --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key 
 - cockroach cert create-client root --certs-dir=$COCKROACHDB_CERTS_PATH --ca-key=$COCKROACHDB_CERTS_PATH/ca.key 
 - /usr/bin/az keyvault secret set --vault-name $KEYVAULT_NAME -n crdbkey -f $COCKROACHDB_CERTS_PATH/ca.key 
