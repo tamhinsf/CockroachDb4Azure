@@ -318,7 +318,8 @@
       "apiVersion": "2018-06-01",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', variables('jumpBoxNicName'))]",
-        "[variables('userManagedIdentityName')]"
+        "[variables('userManagedIdentityName')]",
+        "[variables('lbName')]"
       ],
       "tags": {
         "[variables('crdbTagKey')]" : "[variables('jumpBoxTag')]"
