@@ -383,7 +383,7 @@
               ]
             },
             "protectedSettings": {
-              "commandToExecute": "[concat('bash ', variables('jumpBoxScriptFileName'))]"
+              "commandToExecute": "[concat('bash ', variables('jumpBoxScriptFileName'),' ',parameters('adminUsername'),' ',parameters('adminPassword'))]"
             }
           }
         }

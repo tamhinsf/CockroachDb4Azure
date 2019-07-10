@@ -19,7 +19,7 @@ AZ_FIRST_VMSS_NAME=`az vmss get-instance-view --resource-group $AZ_RG_NAME --nam
 
 cockroach init --certs-dir=$COCKROACHDB_CERTS_PATH --host=$AZ_FIRST_VMSS_NAME
 sleep 30
-cockroach sql  --certs-dir=$COCKROACHDB_CERTS_PATH --host=$AZ_LB_PUBLIC_HOSTNAME --execute="CREATE USER cradmin WITH PASSWORD 'cradmin'"
+cockroach sql  --certs-dir=$COCKROACHDB_CERTS_PATH --host=$AZ_LB_PUBLIC_HOSTNAME --execute="CREATE USER ${1} WITH PASSWORD '${2}'"
 
 # Exit script with 0 code to tell Azure that the deployment is done
 exit 0 
