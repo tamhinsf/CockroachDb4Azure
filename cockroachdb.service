@@ -2,8 +2,7 @@
 Description=Cockroach Database cluster node
 Requires=network.target
 [Service]
-#Type=notify
-Type=forking
+Type=simple
 WorkingDirectory=/var/lib/cockroach
 ExecStart=/home/cockroach/vmssCrdbStartup.sh
 TimeoutStopSec=60   
