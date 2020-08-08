@@ -427,7 +427,7 @@
         ],
         "loadBalancingRules": [        
           {
-            "name": "adminUiLbRule",
+            "name": "cockroachadmin",
             "properties": {
               "frontendIPConfiguration": {
                 "id": "[variables('frontEndIPConfigID')]"
@@ -448,7 +448,7 @@
             }
           },
           {
-            "name": "dbPortRule",
+            "name": "cockroachapp",
             "properties": {
               "frontendIPConfiguration": {
                 "id": "[variables('frontEndIPConfigID')]"

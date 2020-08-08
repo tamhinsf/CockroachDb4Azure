@@ -8,8 +8,8 @@ users:
   shell: /bin/bash
 runcmd:
 - curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash 
-- wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.2.linux-amd64.tgz | tar  xvz
-- cp -i cockroach-v19.1.2.linux-amd64/cockroach /usr/local/bin 
+- wget -qO- https://binaries.cockroachdb.com/cockroach-v20.1.4.linux-amd64.tgz | tar  xvz
+- cp -i cockroach-v20.1.4.linux-amd64/cockroach /usr/local/bin/
 - mkdir /var/lib/cockroach
 - chown -R cockroach:cockroach /var/lib/cockroach 
 - COCKROACH_USER_HOME=/home/cockroach
