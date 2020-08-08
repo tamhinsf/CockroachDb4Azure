@@ -70,6 +70,14 @@
         "description": "Does the VM SKU support Accelerated Networking?"
       }
     },
+    "virtualNetworkPrefix" : {
+      "type" :"string",
+      "defaultValue": "10.3.0.0/24"
+    },
+    "virtualNetworkSubnetPrefix" : {
+      "type": "string",
+      "defaultValue": "10.3.0.0/24"
+    },
     "adminUsername": {
       "type": "string",
       "defaultValue": "crdbadmin",
@@ -117,9 +125,9 @@
     "jumpBoxScriptFileName": "jumpBoxDeploy.sh",
     "jumpBoxScriptUrl" : "[concat(parameters('_artifactsLocation'),variables('jumpBoxScriptFileName'), parameters('_artifactsLocationSasToken'))]",
     "virtualNetworkName": "[concat(variables('namingInfix'), '-vnet')]",
-    "virtualNetworkPrefix": "10.3.0.0/16",
+    "virtualNetworkPrefix": "[parameters('virtualNetworkPrefix')]",
     "subnetName": "[concat(variables('namingInfix'), '-subnet')]",
-    "subnetPrefix": "10.3.0.0/24",
+    "subnetPrefix": "[parameters('virtualNetworkSubnetPrefix')]",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
     "nsgName" : "[concat(variables('namingInfix'),'-nsg')]",
     "lbName": "[concat(variables('namingInfix'), '-lb')]",
